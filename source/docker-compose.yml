@@ -1,0 +1,92 @@
+version: '3.7'
+
+volumes:
+  pgdata:
+
+services:
+  reverseproxy:
+    ports:
+      - "44395:44395"
+    build:
+      context: .
+      # NOTE!!!
+      # Even though we keep nginx.Dockerfile inside /nginx solution folder,
+      # docker-compose tool is not aware of it since it is only a Visual Studio construct.
+      # On the filesystem nginx.Dockerfile is on the same level as docker-compose.yml
+      dockerfile: nginx/nginx.Dockerfile
+    networks:
+      sparkrosedigital_templatenet:
+        aliases:
+          - "api-local.sparkrosedigital_template.com"
+  sparkrosedigital_template.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+    env_file: .env
+    #ports:
+    #  - "5000:5000"
+    build:
+      context: .
+      dockerfile: src/SparkRoseDigital_Template.Api/Dockerfile
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - sparkrosedigital_templatenet
+  sparkrosedigital_template.sql:
+    image: postgres:12-buster
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    command: "-p 5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/InitializeSparkRoseDigital_TemplateDb.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    networks:
+      - sparkrosedigital_templatenet
+  # Comment the below service back in if you want
+  # migrations to happen on docker-compose up.
+  # Don't forget to update Migrations project's connection strings.
+  #sparkrosedigital_template.migrations:
+  #  image: ${DOCKER_REGISTRY-}sparkrosedigital_templatesql
+  #  depends_on:
+  #    - sparkrosedigital_template.sql
+  #  build:
+  #    context: .
+  #    dockerfile: src/SparkRoseDigital_Template.Migrations/Dockerfile
+  #  networks:
+  #    - sparkrosedigital_templatenet
+  sparkrosedigital_template.workerservices:
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+    image: ${DOCKER_REGISTRY-}sparkrosedigital_templateworkerservices
+    env_file: .env
+    depends_on:
+      - sparkrosedigital_template.sql
+    build:
+      context: .
+      dockerfile: src/SparkRoseDigital_Template.WorkerServices/Dockerfile
+    networks:
+      - sparkrosedigital_templatenet
+  sparkrosedigital_template.seq:
+    ports:
+      - "5341:80"
+    image: datalust/seq
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - sparkrosedigital_templatenet
+  sparkrosedigital_template.smtp:
+    ports:
+      - "5010:80"
+    image: rnwood/smtp4dev
+    restart: always
+    networks:
+      - sparkrosedigital_templatenet
+networks:
+  sparkrosedigital_templatenet: {}

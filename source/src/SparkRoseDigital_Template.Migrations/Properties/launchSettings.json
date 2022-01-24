@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SparkRoseDigital_Template.Migrations": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

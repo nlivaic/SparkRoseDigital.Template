@@ -1,0 +1,1 @@
+./src/wait-for-it.sh sparkrosedigital_template.sql:5432 --timeout=0 --strict -- sleep 5s && dotnet ./SparkRoseDigital_Template.WorkerServices.dll

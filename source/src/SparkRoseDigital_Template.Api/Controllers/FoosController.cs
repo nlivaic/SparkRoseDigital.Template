@@ -42,7 +42,7 @@ namespace SparkRoseDigital_Template.Api.Controllers
         }
 
         /// <summary>
-        /// Create a new foo [requires authentication].
+        /// Create a new foo.
         /// </summary>
         /// <param name="createFooCommand">Foo create body.</param>
         /// <returns>Newly created foo.</returns>
@@ -60,7 +60,7 @@ namespace SparkRoseDigital_Template.Api.Controllers
         }
 
         /// <summary>
-        /// Edit foo. Foo can be edited only a certain amount of time after it was created [requires authentication].
+        /// Edit foo.
         /// </summary>
         /// <param name="id">Foo identifier.</param>
         /// <param name="updateFooCommand">Foo edit data.</param>
@@ -76,7 +76,7 @@ namespace SparkRoseDigital_Template.Api.Controllers
         }
 
         /// <summary>
-        /// Delete foo. Foo can be deleted only a certain amount of time after it was created [requires authentication].
+        /// Delete foo.
         /// </summary>
         /// <param name="id">Foo identifier.</param>
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -48,11 +48,11 @@ For migrations to work `.env` file must be properly set up with database credent
 
 The below commands must be executed from solution root folder using Powershell. If this is the first migration in your project, execute:
 
-    .\create_migrations.ps1 '' '0001_Initial'
+    .\create_migration.ps1 '' '0001_Initial'
 
 Every next migration must contain the name of the migration immediately preceeding it:
 
-    .\create_migrations.ps1 '0001_Initial' '0002_Second'
+    .\create_migration.ps1 '0001_Initial' '0002_Second'
 
 ### Applying migrations
 
@@ -66,7 +66,7 @@ It is important to keep the `.template.config` folder where it is. `.nuspec` fil
 
 ## Commands
 
-When making changes to the template, execute the commands below. Don't forget to bump version in `/source/.template.config/template.json` and `/source/SparkRoseDigital.Template.nuspec`. Now, first you need to download `nuget.exe` to a folder above the template folder. Then start executing below commands.
+When making changes to the template, execute the commands below. Don't forget to bump version in `/source/.template.config/template.json` and `/SparkRoseDigital.Template.nuspec`. Now, first you need to download `nuget.exe` to a folder above the template folder. Then start executing below commands.
 
 Package the template:
 

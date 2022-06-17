@@ -3,7 +3,7 @@
   "author": "SparkRose Digital",
   "classifications": [ "Solution" ],
   "name": "SparkRoseDigital.WebApi",
-  "identity": "SparkRoseDigital.WebApi.1.0.2",
+  "identity": "SparkRoseDigital.WebApi.1.0.3",
   "shortName": "srd_sln",
   "tags": {
     "language": "C#",

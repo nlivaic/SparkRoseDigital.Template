@@ -25,7 +25,7 @@ stages:
       steps:
       - script: echo 'Pipeline:\sSparkRoseDigital.Template version $(nugetVersion) \n------------- Build.ArtifactStagingDirectory:\s$(Build.ArtifactStagingDirectory)'
 
-      - script: dotnet build ./source/SparkRoseDigital.Template.sln --configuration Release
+      - script: dotnet build ./source/SparkRoseDigital_Template.sln --configuration Release
         displayName: 'dotnet build $(buildConfiguration)'
 
       - task: DotNetCoreCLI@2

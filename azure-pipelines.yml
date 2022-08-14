@@ -1,0 +1,117 @@
+# ASP.NET Core
+
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+# Versioning source: https://stackoverflow.com/a/60609868/987827
+variables:
+  buildConfiguration: 'Release'
+  major: '1'
+  minor: '0'
+  revision: $[counter(variables['minor'], 1)] # This will get reset every time minor gets bumped.
+  nugetVersion: '$(major).$(minor).$(revision)'
+
+stages:
+- stage: build
+  jobs:
+    - job: build
+      steps:
+      - script: echo 'Pipeline:\sSparkRoseDigital.Template version $(nugetVersion) \n------------- Build.ArtifactStagingDirectory:\s$(Build.ArtifactStagingDirectory)'
+
+      - script: dotnet build ./source/SparkRoseDigital.Template.sln --configuration Release
+        displayName: 'dotnet build $(buildConfiguration)'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet test'
+        inputs:
+          command: 'test'
+          projects: '**/*.csproj'
+          publishTestResults: true
+          configuration: $(buildConfiguration)
+
+      - task: NuGetCommand@2
+        inputs:
+          command: 'pack'
+          packagesToPack: './SparkRoseDigital.Template.nuspec'
+          configuration: '$(buildConfiguration)'
+          packDestination: 'drop'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: '$(nugetVersion)'
+
+      # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish artifacts'
+        inputs:
+          targetPath: '$(Build.ArtifactStagingDirectory)' 
+          artifactName: 'drop'
+          publishLocation: pipeline
+
+# # build must be approved before getting pushed to nuget
+# - stage: wait_for_approval
+#   pool: server
+#   condition: eq(variables['Build.Reason'], 'IndividualCI')
+#   jobs:
+#     - job: waitForApproval
+#       displayName: 'wait for approval'
+#       # timeoutInMinutes: 1440    # 3 days before the build is rejected
+#       steps:
+#       - task: ManualValidation@0
+#         # timeoutInMinutes: 1440    # 3 days before the task is rejected.
+#         inputs:
+#           notifyUsers: $(notify_user_for_approval_1)
+#           instructions: 'Please validate the build before pushing to nuget.org'
+#           onTimeout: reject
+
+# - stage: deploy_to_nuget
+#   condition: eq(variables['Build.Reason'], 'IndividualCI')
+#   jobs:
+#     - job: deployToNuget
+#       displayName: "deploy to nuget.org"
+#       steps:
+#       - task: DownloadPipelineArtifact@2
+#         inputs:
+#           buildType: 'current'
+#           artifactName: 'drop'
+#           downloadPath: '$(Pipeline.Workspace)/drop'
+      
+#       - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Infrastructure.$(nugetVersion).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
+#         displayName: 'dotnet nuget push'
+
+##########################################################
+
+
+# Source: https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core?view=azure-devops&tabs=dotnetfive#publish-artifacts-to-azure-pipelines
+# - task: DotNetCoreCLI@2
+#   displayName: 'dotnet publish'
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: '**/*.csproj'
+#     configuration: $(buildConfiguration)
+#     zipAfterPublish: false
+
+# this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
+# - task: PublishPipelineArtifact@1
+#   displayName: 'Publish artifacts'
+#   inputs:
+#     targetPath: '$(Build.ArtifactStagingDirectory)' 
+#     artifactName: 'drop'
+
+# - task: NuGetAuthenticate@1
+#   inputs:
+#     nuGetServiceConnections: 'nuget-srd-infra'
+
+# - task: NuGetCommand@2
+#   inputs:
+#     command: push
+#     nuGetFeedType: external
+#     publishFeedCredentials: 'nuget-srd-infra'
+#     versioningScheme: byEnvVar
+#     versionEnvVar: nugetVersion

@@ -42,7 +42,7 @@ stages:
           packagesToPack: './SparkRoseDigital.Template.nuspec'
           configuration: '$(buildConfiguration)'
           packDestination: 'drop'
-          versioningScheme: byEnvVar
+          versioningScheme: 'byEnvVar'
           versionEnvVar: nugetVersion
 
       # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.

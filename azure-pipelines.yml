@@ -43,7 +43,7 @@ stages:
           configuration: '$(buildConfiguration)'
           packDestination: 'drop'
           versioningScheme: 'byEnvVar'
-          versionEnvVar: nugetVersion
+          versionEnvVar: 'nugetVersion'
 
       # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
       - task: PublishPipelineArtifact@1

@@ -41,7 +41,7 @@ stages:
           command: 'pack'
           packagesToPack: './SparkRoseDigital.Template.nuspec'
           configuration: '$(buildConfiguration)'
-          packDestination: 'drop'
+          # packDestination: 'drop'
           versioningScheme: 'byEnvVar'
           versionEnvVar: 'nugetVersion'
 

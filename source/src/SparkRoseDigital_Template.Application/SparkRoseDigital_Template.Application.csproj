@@ -13,7 +13,7 @@
 	  <PrivateAssets>all</PrivateAssets>
 	</PackageReference>
 	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-  <PackageReference Include="SparkRoseDigital.Infrastructure" Version="1.0.4" />
+  <PackageReference Include="SparkRoseDigital.Infrastructure" Version="1.0.35" />
 	<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  <PrivateAssets>all</PrivateAssets>

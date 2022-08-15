@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using FluentValidation.AspNetCore;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -18,10 +19,10 @@ using Npgsql;
 using SparkRoseDigital.Infrastructure.Caching;
 using SparkRoseDigital.Infrastructure.HealthCheck;
 using SparkRoseDigital.Infrastructure.Logging;
-using SparkRoseDigital.Infrastructure.MessageBroker;
 using SparkRoseDigital_Template.Api.Helpers;
 using SparkRoseDigital_Template.Api.Middlewares;
 using SparkRoseDigital_Template.Application;
+using SparkRoseDigital_Template.Common.MessageBroker;
 using SparkRoseDigital_Template.Core;
 using SparkRoseDigital_Template.Data;
 
@@ -151,11 +152,21 @@ namespace SparkRoseDigital_Template.Api
             //        options.ApiName = _configuration["IdentityProvider:ApiName"];           // Allows the access token validator to check if the access token `audience` is for this API.
             //    });
             //services.AddAuthorization();
-            services.AddApiEventPublisher(
-                new MessageBrokerConnectionStringBuilder(
-                    _configuration.GetConnectionString("MessageBroker"),
-                    _configuration["MessageBroker:Writer:SharedAccessKeyName"],
-                    _configuration["MessageBroker:Writer:SharedAccessKey"]).ConnectionString);
+
+            services.AddMassTransit(x =>
+            {
+                x.UsingAzureServiceBus((ctx, cfg) =>
+                {
+                    cfg.Host(new MessageBrokerConnectionStringBuilder(
+                        _configuration.GetConnectionString("MessageBroker"),
+                        _configuration["MessageBroker:Writer:SharedAccessKeyName"],
+                        _configuration["MessageBroker:Writer:SharedAccessKey"]).ConnectionString);
+
+                    // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
+                    // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
+                    // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
+                });
+            });
             services.AddSparkRoseDigital_TemplateApplicationHandlers();
 
             services.Configure<ForwardedHeadersOptions>(options =>

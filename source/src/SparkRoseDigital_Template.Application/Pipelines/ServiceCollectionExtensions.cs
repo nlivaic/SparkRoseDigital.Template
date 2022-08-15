@@ -13,7 +13,6 @@ namespace SparkRoseDigital_Template.Application.Pipelines
         public static void AddPipelines(this IServiceCollection services)
         {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingPipeline<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(EventDispatcherPipeline<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkPipeline<,>));
         }
     }

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SparkRoseDigital.Infrastructure.MessageBroker;
 using SparkRoseDigital_Template.Data;
 
 namespace SparkRoseDigital_Template.Api.Tests.Helpers
@@ -51,16 +50,17 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
                 {
                     services.Remove(descriptor);
                 }
-                var descriptors = services.Where(d =>
-                    d.ServiceType == typeof(IEventRegister)
-                    || d.ServiceType == typeof(IRegisteredEventPublisher)).ToList();
-                if (descriptors.Count() == 2)
-                {
-                    services.Remove(descriptors[0]);
-                    services.Remove(descriptors[1]);
-                }
-                services.AddScoped<IEventRegister, FakeEventRegister>();
-                services.AddScoped<IRegisteredEventPublisher, FakeEventRegister>();
+                // An example of how to register fake classes with the services container.
+                //var descriptors = services.Where(d =>
+                //    d.ServiceType == typeof(IEventRegister)
+                //    || d.ServiceType == typeof(IRegisteredEventPublisher)).ToList();
+                //if (descriptors.Count() == 2)
+                //{
+                //    services.Remove(descriptors[0]);
+                //    services.Remove(descriptors[1]);
+                //}
+                //services.AddScoped<IEventRegister, FakeEventRegister>();
+                //services.AddScoped<IRegisteredEventPublisher, FakeEventRegister>();
                 services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                 {
                     options.UseSqlite(KeepAliveConnection);

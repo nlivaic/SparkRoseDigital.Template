@@ -53,36 +53,36 @@ stages:
           artifactName: 'drop'
           publishLocation: pipeline
 
-# # build must be approved before getting pushed to nuget
-# - stage: wait_for_approval
-#   pool: server
-#   condition: eq(variables['Build.Reason'], 'IndividualCI')
-#   jobs:
-#     - job: waitForApproval
-#       displayName: 'wait for approval'
-#       # timeoutInMinutes: 1440    # 3 days before the build is rejected
-#       steps:
-#       - task: ManualValidation@0
-#         # timeoutInMinutes: 1440    # 3 days before the task is rejected.
-#         inputs:
-#           notifyUsers: $(notify_user_for_approval_1)
-#           instructions: 'Please validate the build before pushing to nuget.org'
-#           onTimeout: reject
+# build must be approved before getting pushed to nuget
+- stage: wait_for_approval
+  pool: server
+  condition: eq(variables['Build.Reason'], 'IndividualCI')
+  jobs:
+    - job: waitForApproval
+      displayName: 'wait for approval'
+      # timeoutInMinutes: 1440    # 3 days before the build is rejected
+      steps:
+      - task: ManualValidation@0
+        # timeoutInMinutes: 1440    # 3 days before the task is rejected.
+        inputs:
+          notifyUsers: $(notify_user_for_approval_1)
+          instructions: 'Please validate the build before pushing to nuget.org'
+          onTimeout: reject
 
-# - stage: deploy_to_nuget
-#   condition: eq(variables['Build.Reason'], 'IndividualCI')
-#   jobs:
-#     - job: deployToNuget
-#       displayName: "deploy to nuget.org"
-#       steps:
-#       - task: DownloadPipelineArtifact@2
-#         inputs:
-#           buildType: 'current'
-#           artifactName: 'drop'
-#           downloadPath: '$(Pipeline.Workspace)/drop'
+- stage: deploy_to_nuget
+  condition: eq(variables['Build.Reason'], 'IndividualCI')
+  jobs:
+    - job: deployToNuget
+      displayName: "deploy to nuget.org"
+      steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'drop'
+          downloadPath: '$(Pipeline.Workspace)/drop'
       
-#       - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Infrastructure.$(nugetVersion).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
-#         displayName: 'dotnet nuget push'
+      - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Template.$(nugetVersion).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
+        displayName: 'dotnet nuget push'
 
 ##########################################################
 

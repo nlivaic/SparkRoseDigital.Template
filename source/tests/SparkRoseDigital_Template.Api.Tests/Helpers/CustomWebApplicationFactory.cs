@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using MassTransit;
+using MassTransit.Testing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -8,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Moq;
 using SparkRoseDigital_Template.Data;
 
 namespace SparkRoseDigital_Template.Api.Tests.Helpers
@@ -50,24 +53,16 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
                 {
                     services.Remove(descriptor);
                 }
-                // An example of how to register fake classes with the services container.
-                //var descriptors = services.Where(d =>
-                //    d.ServiceType == typeof(IEventRegister)
-                //    || d.ServiceType == typeof(IRegisteredEventPublisher)).ToList();
-                //if (descriptors.Count() == 2)
-                //{
-                //    services.Remove(descriptors[0]);
-                //    services.Remove(descriptors[1]);
-                //}
-                //services.AddScoped<IEventRegister, FakeEventRegister>();
-                //services.AddScoped<IRegisteredEventPublisher, FakeEventRegister>();
                 services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                 {
                     options.UseSqlite(KeepAliveConnection);
                 });
+                services.AddMassTransitTestHarness();
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
                 var scopedServices = scope.ServiceProvider;
+                //var harness = scopedServices.GetRequiredService<ITestHarness>();
+                //harness.Start().GetAwaiter().GetResult();
                 var ctx = scopedServices.GetRequiredService<SparkRoseDigital_TemplateDbContext>();
                 ctx.Database.EnsureCreated();
                 ctx.Seed();

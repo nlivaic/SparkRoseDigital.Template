@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nginx", "nginx", "{B1B5AD5F-A085-41BE-9A56-B1CB403C311C}"
 	ProjectSection(SolutionItems) = preProject
@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		create_migration.ps1 = create_migration.ps1
+		Directory.Packages.props = Directory.Packages.props
 		migrate.ps1 = migrate.ps1
 	EndProjectSection
 EndProject

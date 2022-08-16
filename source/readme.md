@@ -8,21 +8,30 @@ E.g. Docker Desktop:
 
 ## Configure Azure Service Bus
 
-Create a new namespace, with two Shared access policies, one for reading (called "ReaderPolicy") and one for writing (called "WriterPolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://whatever.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
+Create a new namespace, with two Shared access policies, one for reading (called "ReaderPolicy") and one for writing (called "WriterPolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://yourApplicationName.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
 
-## Set environment variables
+## Configuration
 
-`.env` file example:
+### Set environment variables
 
-    ConnectionStrings__MessageBroker=
-    MessageBroker__Writer__SharedAccessKeyName=
-    MessageBroker__Writer__SharedAccessKey=
-    MessageBroker__Reader__SharedAccessKeyName=
-    MessageBroker__Reader__SharedAccessKey=
-    EmailSettings__Username=
-    EmailSettings__Password=
-    DB_USER=
-    DB_PASSWORD=
+Most of the stuff is in the `.env` file. Below is an empty file, you have to provide following information:
+
+- Connection strings and details for the Service Bus (details above)
+- Usernames and passwords for the email and database. You can provide whatever values you want.
+
+  ConnectionStrings\_\_MessageBroker=
+  MessageBroker\_\_Writer\_\_SharedAccessKeyName=
+  MessageBroker\_\_Writer\_\_SharedAccessKey=
+  MessageBroker\_\_Reader\_\_SharedAccessKeyName=
+  MessageBroker\_\_Reader\_\_SharedAccessKey=
+  EmailSettings\_\_Username=
+  EmailSettings\_\_Password=
+  DB_USER=
+  DB_PASSWORD=
+
+### Database connection string
+
+Database connection string for both `Api` and `Migrations` projects is not in the `.env` file. This was a deliberate choice, because I wanted the templated project to have a connection string automatically generated and in line with the name of the solution. You can find the complete database connection string in the `appsettings.Development.json`. If you are uncomfortable keeping it there, just move it to the `.env` file and name the environment variable `ConnectionStrings__YourSolutionNameDbConnection`.
 
 # Running The Application
 

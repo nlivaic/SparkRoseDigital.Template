@@ -18,18 +18,15 @@ namespace SparkRoseDigital_Template.Application.Questions.Commands
         private class CreateFooCommandHandler : IRequestHandler<CreateFooCommand, FooGetModel>
         {
             private readonly IPublishEndpoint _publishEndpoint;
-            private readonly ISendEndpointProvider _sendEndpoint;
             private readonly IRepository<Foo> _repository;
             private readonly IMapper _mapper;
 
             public CreateFooCommandHandler(
                 IPublishEndpoint publishEndpoint,
-                ISendEndpointProvider sendEndpoint,
                 IRepository<Foo> repository,
                 IMapper mapper)
             {
                 _publishEndpoint = publishEndpoint;
-                _sendEndpoint = sendEndpoint;
                 _repository = repository;
                 _mapper = mapper;
             }

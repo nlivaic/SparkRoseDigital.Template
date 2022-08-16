@@ -5,6 +5,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,17 +28,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="dbup-postgresql" Version="4.5.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+    <PackageReference Include="dbup-postgresql" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
-    <PackageReference Include="Npgsql" Version="5.0.10" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="StyleCop.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

@@ -1,31 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="MassTransit" Version="8.0.5" />
-    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.0.5" />
-    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.Azure.ServiceBus.Core" />
+    <PackageReference Include="MassTransit.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
-    <PackageReference Include="Serilog.Enrichers.Span" Version="2.0.1" />
-    <PackageReference Include="Serilog.Exceptions" Version="8.0.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-    <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.0" />
-    <PackageReference Include="SparkRoseDigital.Infrastructure" Version="1.0.35" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Serilog.Enrichers.Span" />
+    <PackageReference Include="Serilog.Exceptions" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.Seq" />
+    <PackageReference Include="SparkRoseDigital.Infrastructure" />
+    <PackageReference Include="StyleCop.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

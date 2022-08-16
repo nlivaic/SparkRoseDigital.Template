@@ -1,20 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
-	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-	<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" />
+	<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+	<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  <PrivateAssets>all</PrivateAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-  <PackageReference Include="SparkRoseDigital.Infrastructure" Version="1.0.35" />
-	<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+	<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  <PackageReference Include="SparkRoseDigital.Infrastructure" />
+	<PackageReference Include="StyleCop.Analyzers">
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  <PrivateAssets>all</PrivateAssets>
 	</PackageReference>

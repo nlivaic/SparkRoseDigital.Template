@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="StyleCop.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -20,6 +20,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
 </Project>

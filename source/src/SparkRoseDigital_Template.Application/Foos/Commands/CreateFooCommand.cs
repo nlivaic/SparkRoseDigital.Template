@@ -42,18 +42,12 @@ namespace SparkRoseDigital_Template.Application.Questions.Commands
                 }
                 var foo = new Foo(request.Text);
                 await _repository.AddAsync(foo);
-                try
-                {
-                    // sending to queue
-                    await _publishEndpoint.Publish<IFooCommand>(new { Text = foo.Text });
 
-                    // sending to topic
-                    await _publishEndpoint.Publish<IFooEvent>(new { Text = foo.Text });
-                }
-                catch (System.Exception ex)
-                {
-                    throw;
-                }
+                // sending to queue
+                await _publishEndpoint.Publish<IFooCommand>(new { Text = foo.Text });
+
+                // sending to topic
+                await _publishEndpoint.Publish<IFooEvent>(new { Text = foo.Text });
                 return _mapper.Map<FooGetModel>(foo);
             }
         }

@@ -115,7 +115,6 @@ namespace SparkRoseDigital_Template.WorkerServices
                             cfg.UseExceptionLogger(services);
                         });
                     });
-                    services.AddMassTransitHostedService();
                 });
     }
 }

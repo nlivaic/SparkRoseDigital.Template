@@ -2,8 +2,8 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "SparkRose Digital",
   "classifications": [ "Solution" ],
-  "name": "SparkRoseDigital.WebApi",
-  "identity": "SparkRoseDigital.WebApi.1.0.3",
+  "name": "SparkRoseDigital.Template",
+  "identity": "SparkRoseDigital.Template",
   "shortName": "srd_sln",
   "tags": {
     "language": "C#",

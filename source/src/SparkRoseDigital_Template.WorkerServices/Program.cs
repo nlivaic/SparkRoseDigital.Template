@@ -16,7 +16,7 @@ using SparkRoseDigital_Template.Core;
 using SparkRoseDigital_Template.Core.Events;
 using SparkRoseDigital_Template.Data;
 using SparkRoseDigital_Template.WorkerServices.FaultService;
-using SparkRoseDigital_Template.WorkerServices.PointService;
+using SparkRoseDigital_Template.WorkerServices.FooService;
 
 namespace SparkRoseDigital_Template.WorkerServices
 {
@@ -78,6 +78,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                         x.AddConsumer<FooConsumer>();
                         x.AddConsumer<FooFaultConsumer>();
                         x.AddConsumer<FaultConsumer>();
+                        x.AddConsumer<FooCommandConsumer>(typeof(FooCommandConsumer.FooCommandConsumerDefinition));
                         x.UsingAzureServiceBus((ctx, cfg) =>
                         {
                             cfg.Host(
@@ -90,14 +91,14 @@ namespace SparkRoseDigital_Template.WorkerServices
                             // SetKebabCaseEndpointNameFormatter() in the publishing project (see API project),
                             // but have rather given the topic a custom name.
                             // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("foo-topic"));
-                            cfg.SubscriptionEndpoint<IFooEvent>("foo-consumer", e =>
+                            cfg.SubscriptionEndpoint<IFooEvent>("foo-event-subscription-1", e =>
                             {
                                 e.ConfigureConsumer<FooConsumer>(ctx);
                             });
 
                             // This is here only for show. I have not thought through a proper
                             // error handling strategy.
-                            cfg.SubscriptionEndpoint<Fault<IFooEvent>>("foo-fault-consumer", e =>
+                            cfg.SubscriptionEndpoint<Fault<IFooEvent>>("foo-event-fault-consumer", e =>
                             {
                                 e.ConfigureConsumer<FooFaultConsumer>(ctx);
                             });

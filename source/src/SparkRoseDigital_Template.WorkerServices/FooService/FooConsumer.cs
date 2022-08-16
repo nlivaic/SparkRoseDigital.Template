@@ -2,11 +2,11 @@
 using MassTransit;
 using SparkRoseDigital_Template.Core.Events;
 
-namespace SparkRoseDigital_Template.WorkerServices.PointService
+namespace SparkRoseDigital_Template.WorkerServices.FooService
 {
     public class FooConsumer : IConsumer<IFooEvent>
     {
         public Task Consume(ConsumeContext<IFooEvent> context) =>
-            throw new System.NotImplementedException();
+            Task.CompletedTask;
     }
 }

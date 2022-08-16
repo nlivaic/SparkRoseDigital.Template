@@ -1,15 +1,20 @@
-# Getting Started
+# Before You Get Started
 
-### Install a Docker host
+## Install a Docker host
 
 E.g. Docker Desktop:
 
     choco install docker-desktop
 
-### Set environment variables
+## Configure Azure Service Bus
+
+Create a new namespace, with two Shared access policies, one for reading (called "ReaderPolicy") and one for writing (called "WriterPolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://whatever.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
+
+## Set environment variables
 
 `.env` file example:
 
+    ConnectionStrings__MessageBroker=
     MessageBroker__Writer__SharedAccessKeyName=
     MessageBroker__Writer__SharedAccessKey=
     MessageBroker__Reader__SharedAccessKeyName=
@@ -19,20 +24,36 @@ E.g. Docker Desktop:
     DB_USER=
     DB_PASSWORD=
 
-### Generating cert for your local development box
+# Running The Application
+
+Make sure to set the `docker-compose` as the startup project. The application can be reached by default on `localhost:44395`. You can change this in the `docker-compose.yml`. Just go to `/swagger/index.html` to see the initial API.
+
+At this point you have several things up and running:
+
+- API
+- Worker service
+- Empty PostgreSQL database.
+- Azure Service bus with several topics, subscriptions and queues.
+
+Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the PgAdmin and register your database server there. It is accessible on localhost, port 5432, with the password you set in your `.env` file.
+
+# Additional Stuff
+
+## Generating cert for your local development box
 
 The template does not use HTTPS, however it can easily be added. There is a `.conf` file in there which you need to tweak to your liking. Then you need to generate `.crt` and `.key` files for Api. These make up the self-signed certificate, and the commands to create the certificate are below, with a dummy password of `rootpw`:
 
 1. Go to **solution root folder** and execute below lines from **WSL2**:
 
    sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout api-local.sparkrosedigital_template.key -out api-local.sparkrosedigital_template.crt -config api-local.sparkrosedigital_template.conf -passin pass:rootpw
+
    sudo openssl pkcs12 -export -out api-local.sparkrosedigital_template.pfx -inkey api-local.sparkrosedigital_template.key -in api-local.sparkrosedigital_template.crt
 
 2. Add the certificate to your computers CA store: go to ./nginx, right-click on `.pfx` files and install to `LocalMachine` -> `Trusted Root Certification Authorities`.
 
 For more details consult: https://bit.ly/3eWOHH2
 
-### Hosts file
+## Hosts file
 
 You can tell nginx to work with the `localhost`, however this might become a problem if you have multiple services running. To sidestep the issue you can keep the nginx.conf as it is, but that will require a change to `hosts` file.
 
@@ -40,9 +61,9 @@ You can tell nginx to work with the `localhost`, however this might become a pro
     127.0.0.1	    api-local.sparkrosedigital_template.com
     127.0.0.1	    id-local.sparkrosedigital_template.com
 
-# Migrations
+## Migrations
 
-For migrations to work `.env` file must be properly set up with database credentials and the `Migrations` project's `appsettings.json` / `appsettings.Development.json` must have the connection string configured.
+For migrations to work `.env` file must be properly set up with database credentials and connection string configured.
 
 ### Creating migrations
 
@@ -59,27 +80,3 @@ Every next migration must contain the name of the migration immediately preceedi
 Command must be executed from solution root folder using Powershell. You will notice it is executing from a Docker container and Docker compose - the reason is this way there is only one `.env` which can be shared by all executeable projects in the solution (`Ąpi`, `Migrations`, `WorkerServices`).
 
     ./migrate.ps1
-
-# Working with the template
-
-It is important to keep the `.template.config` folder where it is. `.nuspec` file also must be kept in the same location as it is now.
-
-## Commands
-
-When making changes to the template, execute the commands below. Don't forget to bump version in `/source/.template.config/template.json` and `/SparkRoseDigital.Template.nuspec`. Now, first you need to download `nuget.exe` to a folder above the template folder. Then start executing below commands.
-
-Package the template:
-
-    ./nuget.exe pack ./<template_folder>/SparkRoseDigital.Template.nuspec -OutputDirectory ./SparkRoseDigital.Template.NugetPackage/nupkg -NoDefaultExcludes
-
-Install from the local NuGet package file (do this only for testing purposes):
-
-    dotnet new --install ./SparkRoseDigital.Template.NugetPackage/nupkg/SparkRoseDigital.Template.<version>.nupkg
-
-Push to Nuget (find the api key in the vault):
-
-    dotnet nuget push ./SparkRoseDigital.Template.NugetPackage/nupkg/SparkRoseDigital.Template.<version>.nupkg --api-key <api_key> --source https://api.nuget.org/v3/index.json
-
-Install the template from NuGet feed (get the below command from NuGet template entry):
-
-    dotnet new --install SparkRoseDigital.Template::<version>

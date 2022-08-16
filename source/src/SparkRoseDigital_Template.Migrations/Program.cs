@@ -36,13 +36,10 @@ namespace SparkRoseDigital_Template.Migrations
                 scriptsPath = args[2];
             }
 
-            Console.WriteLine($"-------> {connectionStringSparkRoseDigital_Template}");
-
             var upgraderSparkRoseDigital_Template =
                 DeployChanges.To
                     .PostgresqlDatabase(connectionStringSparkRoseDigital_Template)
                     .WithScriptsFromFileSystem(
-                        //scriptsPath != null
                         !string.IsNullOrWhiteSpace(scriptsPath)
                                 ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateScripts")
                             : Path.Combine(Environment.CurrentDirectory, "SparkRoseDigital_TemplateScripts"))
@@ -67,39 +64,42 @@ namespace SparkRoseDigital_Template.Migrations
                 return -1;
             }
 
-            //var connectionStringSparkRoseDigital_TemplateIdentity = string.IsNullOrWhiteSpace(args.FirstOrDefault())
-            //    ? config["ConnectionStrings:SparkRoseDigital_TemplateIdentityDb"]
-            //    : args.FirstOrDefault();
+            // Uncomment the below sections if you also have an Identity Server project in the solution.
+            /*
+            var connectionStringSparkRoseDigital_TemplateIdentity = string.IsNullOrWhiteSpace(args.FirstOrDefault())
+                ? config["ConnectionStrings:SparkRoseDigital_TemplateIdentityDb"]
+                : args.FirstOrDefault();
 
-            //var upgraderSparkRoseDigital_TemplateIdentity =
-            //    DeployChanges.To
-            //        .PostgresqlDatabase(connectionStringSparkRoseDigital_TemplateIdentity)
-            //        .WithScriptsFromFileSystem(
-            //            scriptsPath != null
-            //                ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateIdentityScripts")
-            //                : Path.Combine(Environment.CurrentDirectory, "SparkRoseDigital_TemplateIdentityScripts"))
-            //        .LogToConsole()
-            //        .Build();
-            //Console.WriteLine($"Now upgrading SparkRoseDigital_Template Identity.");
-            //if (env != "Development")
-            //{
-            //    upgraderSparkRoseDigital_TemplateIdentity.MarkAsExecuted("0004_InitialData.sql");
-            //    Console.WriteLine($"Skipping 0004_InitialData.sql since we are not in Development environment.");
-            //    upgraderSparkRoseDigital_TemplateIdentity.MarkAsExecuted("0005_Initial_Configuration_Data.sql");
-            //    Console.WriteLine($"Skipping 0005_Initial_Configuration_Data.sql since we are not in Development environment.");
-            //}
-            //var resultSparkRoseDigital_TemplateIdentity = upgraderSparkRoseDigital_TemplateIdentity.PerformUpgrade();
+            var upgraderSparkRoseDigital_TemplateIdentity =
+                DeployChanges.To
+                    .PostgresqlDatabase(connectionStringSparkRoseDigital_TemplateIdentity)
+                    .WithScriptsFromFileSystem(
+                        scriptsPath != null
+                            ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateIdentityScripts")
+                            : Path.Combine(Environment.CurrentDirectory, "SparkRoseDigital_TemplateIdentityScripts"))
+                    .LogToConsole()
+                    .Build();
+            Console.WriteLine($"Now upgrading SparkRoseDigital_Template Identity.");
+            if (env != "Development")
+            {
+                upgraderSparkRoseDigital_TemplateIdentity.MarkAsExecuted("0004_InitialData.sql");
+                Console.WriteLine($"Skipping 0004_InitialData.sql since we are not in Development environment.");
+                upgraderSparkRoseDigital_TemplateIdentity.MarkAsExecuted("0005_Initial_Configuration_Data.sql");
+                Console.WriteLine($"Skipping 0005_Initial_Configuration_Data.sql since we are not in Development environment.");
+            }
+            var resultSparkRoseDigital_TemplateIdentity = upgraderSparkRoseDigital_TemplateIdentity.PerformUpgrade();
 
-            //if (!resultSparkRoseDigital_TemplateIdentity.Successful)
-            //{
-            //    Console.ForegroundColor = ConsoleColor.Red;
-            //    Console.WriteLine($"SparkRoseDigital_Template Identity upgrade error: {resultSparkRoseDigital_TemplateIdentity.Error}");
-            //    Console.ResetColor();
-//#if DEBUG
-            //  Console.ReadLine();
-//#endif
-            //  return -1;
-            //}
+            if (!resultSparkRoseDigital_TemplateIdentity.Successful)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"SparkRoseDigital_Template Identity upgrade error: {resultSparkRoseDigital_TemplateIdentity.Error}");
+                Console.ResetColor();
+#if DEBUG
+                Console.ReadLine();
+#endif
+                return -1;
+            }
+            */
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Success!");

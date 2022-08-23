@@ -46,11 +46,6 @@ namespace SparkRoseDigital_Template.Migrations
                     .LogToConsole()
                     .Build();
             Console.WriteLine($"Now upgrading SparkRoseDigital_Template.");
-            if (env != "Development")
-            {
-                Console.WriteLine($"Skipping 0005_InitialData.sql since we are not in Development environment.");
-                upgraderSparkRoseDigital_Template.MarkAsExecuted("0005_InitialData.sql");
-            }
             var resultSparkRoseDigital_Template = upgraderSparkRoseDigital_Template.PerformUpgrade();
 
             if (!resultSparkRoseDigital_Template.Successful)

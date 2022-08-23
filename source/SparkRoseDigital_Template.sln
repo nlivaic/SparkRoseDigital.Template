@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nginx", "nginx", "{B1B5AD5F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{11964691-E1D7-48AF-B5F5-DE744584AF5D}"
 	ProjectSection(SolutionItems) = preProject
-		sql\Dockerfile = sql\Dockerfile
 		sql\InitializeSparkRoseDigital_TemplateDb.sql = sql\InitializeSparkRoseDigital_TemplateDb.sql
 	EndProjectSection
 EndProject

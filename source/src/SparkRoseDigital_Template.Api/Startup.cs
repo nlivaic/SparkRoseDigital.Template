@@ -9,13 +9,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Npgsql;
 using SparkRoseDigital.Infrastructure.Caching;
 using SparkRoseDigital.Infrastructure.HealthCheck;
 using SparkRoseDigital.Infrastructure.Logging;
@@ -71,12 +71,12 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
             {
-                var connString = new NpgsqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
+                var connString = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
                 {
-                    Username = _configuration["DB_USER"],
-                    Password = _configuration["DB_PASSWORD"]
+                    UserID = _configuration["DB_USER"] ?? string.Empty,
+                    Password = _configuration["DB_PASSWORD"] ?? string.Empty
                 };
-                options.UseNpgsql(connString.ConnectionString);
+                options.UseSqlServer(connString.ConnectionString);
                 if (_hostEnvironment.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging(true);

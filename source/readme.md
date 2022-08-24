@@ -12,26 +12,23 @@ Create a new namespace, with two Shared access policies, one for reading (called
 
 ## Configuration
 
-### Set environment variables
+### Set configuration
 
-Most of the stuff is in the `.env` file. Below is an empty file, you have to provide following information:
+Most of the stuff is in the `.env` file. This is a git ignored file, but it has the relevant structure in it. Some of the fields are prepopulated, others have to be provided by you:
 
-- Connection strings and details for the Service Bus (details above)
-- Usernames and passwords for the email and database. You can provide whatever values you want.
+- Connection strings and details for the Service Bus (details above).
+- Username and password for the email are provided as default values, but you can provide whatever values you want.
 
-  ConnectionStrings\_\_MessageBroker=
-  MessageBroker\_\_Writer\_\_SharedAccessKeyName=
-  MessageBroker\_\_Writer\_\_SharedAccessKey=
-  MessageBroker\_\_Reader\_\_SharedAccessKeyName=
-  MessageBroker\_\_Reader\_\_SharedAccessKey=
-  EmailSettings\_\_Username=
-  EmailSettings\_\_Password=
-  DB_USER=
-  DB_PASSWORD=
+### Database configuration
 
-### Database connection string
+Database connection string for both `Api`, `WorkerServices` and `Migrations` projects is in the `.env` file. This was a deliberate choice, because I wanted the templated project to have a connection string automatically generated and in line with the name of the solution. You will notice there are two connection strings: `ConnectionStrings__SparkRoseDigital_TemplateDbConnection` is used by `Api` and `WorkerServices`. `Migrations` has a separate one `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection` because it is accessing the dockerized database from outside.
 
-Database connection string for both `Api` and `Migrations` projects is not in the `.env` file. This was a deliberate choice, because I wanted the templated project to have a connection string automatically generated and in line with the name of the solution. You can find the complete database connection string in the `appsettings.Development.json`. If you are uncomfortable keeping it there, just move it to the `.env` file and name the environment variable `ConnectionStrings__YourSolutionNameDbConnection`.
+Username and password for the database are provided as default values, but you can provide whatever values you want.
+Make sure you set the database-related variables (prefixed `DB_`) before you run the solution for the first time, otherwise the database will be configured with given administrator password and a username and password for the application user. If you don't change those values before running the solution you will have to delete the `sparkrosedigital_template.sql` container and accompanying volumes. If you change `DB_PASSWORD`, make sure the same value is set in `InitializeSparkRoseDigital_TemplateDb.sql` for the login as well.
+
+When you first run the solution, an SQL script found in `src/InitializeSparkRoseDigital_TemplateDb.sql` is executed, creating the database with an admin account (password in `DB_ADMIN_PASSWORD`), login and user (`DB_USER` and `DB_PASSWORD`). User is then assigned to read, write and DDL roles.
+
+Application is accessing the database as a `DB_USER`/`DB_PASSWORD`, with a generated connection string found in `ConnectionStrings__SparkRoseDigital_TemplateDbConnection` and `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`.
 
 # Running The Application
 
@@ -41,10 +38,13 @@ At this point you have several things up and running:
 
 - API
 - Worker service
-- Empty PostgreSQL database.
+- Empty Sql Server database.
 - Azure Service bus with several topics, subscriptions and queues.
+- nginx reverse proxy
+- Smtp fake email server
+- Seq log management service
 
-Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the PgAdmin and register your database server there. It is accessible on localhost, port 5432, with the password you set in your `.env` file.
+Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the SSMS and register your database server there. It is accessible on localhost, port 1433, with the username and password you set in your `.env` file under `DB_USER` and `DB_PASSWORD`.
 
 # Additional Stuff
 

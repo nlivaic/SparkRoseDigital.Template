@@ -36,8 +36,8 @@ stages:
           publishTestResults: true
           configuration: $(buildConfiguration)
 
-      - script: nuget.exe pack ./SparkRoseDigital.Template.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -Properties Configuration=Release -version $(nugetVersion) -Verbosity Detailed
-        displayName: 'nuget pack'
+      # - script: nuget.exe pack
+      #   displayName: 'nuget pack'
       # - task: NuGetCommand@2
       #   displayName: 'nuget pack'
       #   inputs:
@@ -47,6 +47,11 @@ stages:
       #     # packDestination: 'drop'
       #     versioningScheme: 'byEnvVar'
       #     versionEnvVar: 'nugetVersion'
+      - task: NuGetCommand@2
+        displayName: 'nuget pack'
+        inputs:
+          command: 'custom'
+          arguments: 'pack ./SparkRoseDigital.Template.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -Properties Configuration=Release -version $(nugetVersion) -Verbosity Detailed -NoDefaultExcludes'
 
       # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
       - task: PublishPipelineArtifact@1

@@ -56,7 +56,7 @@ stages:
 # build must be approved before getting pushed to nuget
 - stage: wait_for_approval
   pool: server
-  condition: neq(variables['Build.Reason'], 'PullRequest')
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   jobs:
     - job: waitForApproval
       displayName: 'wait for approval'
@@ -70,7 +70,7 @@ stages:
           onTimeout: reject
 
 - stage: deploy_to_nuget
-  condition: neq(variables['Build.Reason'], 'PullRequest')
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   jobs:
     - job: deployToNuget
       displayName: "deploy to nuget.org"

@@ -71,7 +71,7 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
             {
-                var connString = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
+                var connString = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection") ?? string.Empty)
                 {
                     UserID = _configuration["DB_USER"] ?? string.Empty,
                     Password = _configuration["DB_PASSWORD"] ?? string.Empty

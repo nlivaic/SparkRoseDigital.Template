@@ -23,7 +23,7 @@ namespace SparkRoseDigital_Template.Migrations
 
             var connectionStringSparkRoseDigital_Template = new SqlConnectionStringBuilder(
                 string.IsNullOrWhiteSpace(args.FirstOrDefault())
-                    ? config["ConnectionStrings:SparkRoseDigital_TemplateDbConnection"]
+                    ? config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"]
                     : args.FirstOrDefault())
             {
                 UserID = config["DB_USER"],

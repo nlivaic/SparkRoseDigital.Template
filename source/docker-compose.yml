@@ -39,7 +39,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       ACCEPT_EULA: Y
-      SA_PASSWORD: ${DB_PASSWORD}
+      SA_PASSWORD: ${DB_ADMIN_PASSWORD}
       MSSQL_PID: Standard
     user: root
     ports:

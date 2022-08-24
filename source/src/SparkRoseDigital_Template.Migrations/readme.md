@@ -1,12 +1,7 @@
-﻿#### How to migrate the database
+﻿# How to migrate the database
 
-##### Development
+Please refer to solution level readme.md on how to create and apply migrations.
 
-No need to do anything. When the solution is ran Docker will run both the database container and 
-DbUp migration container. Migration container will wait for the database to spin up and then 
-will execute the migrations.
+# Architecture
 
-##### Production
-
-Configure connection string using CLI arguments. First argument should be a string with the entire
-connection string.
+There is a `docker-compose-migration.yml` dedicated just to running the `./migrate.ps1` command from the solution root folder. This was done in order to share `.env` file with the main `docker-compose.yml` file so `DB_USER` and `DB_PASSWORD` would not have to copied separately to this project.

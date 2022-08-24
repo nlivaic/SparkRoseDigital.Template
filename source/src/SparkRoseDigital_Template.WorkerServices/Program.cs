@@ -1,11 +1,11 @@
 using System;
 using System.Reflection;
 using MassTransit;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Npgsql;
 using Serilog;
 using SparkRoseDigital.Infrastructure.Caching;
 using SparkRoseDigital.Infrastructure.Logging;
@@ -55,12 +55,12 @@ namespace SparkRoseDigital_Template.WorkerServices
                     var hostEnvironment = hostContext.HostingEnvironment;
                     services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                     {
-                        var connString = new NpgsqlConnectionStringBuilder(configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
+                        var connString = new SqlConnectionStringBuilder(configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
                         {
-                            Username = configuration["DB_USER"],
+                            UserID = configuration["DB_USER"],
                             Password = configuration["DB_PASSWORD"]
                         };
-                        options.UseNpgsql(connString.ConnectionString);
+                        options.UseSqlServer(connString.ConnectionString);
                         if (hostEnvironment.IsDevelopment())
                         {
                             options.EnableSensitiveDataLogging(true);

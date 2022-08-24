@@ -22,17 +22,18 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageVersion Include="AutoMapper" Version="10.1.1" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.13" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.2.14" />
-    <PackageVersion Include="dbup-postgresql" Version="4.5.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
-    <PackageVersion Include="Npgsql" Version="5.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="4.2.0" />
     <PackageVersion Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="4.0.1" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
+	<PackageVersion Include="Microsoft.Data.SqlClient" Version="5.0.0" />
+	<PackageVersion Include="dbup-sqlserver" Version="4.6.0" />
+	<PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
   </ItemGroup>
 </Project>

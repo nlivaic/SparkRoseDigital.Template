@@ -1,8 +1,37 @@
-CREATE DATABASE "SparkRoseDigital_TemplateDb"
-    WITH 
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.utf8'
-    LC_CTYPE = 'en_US.utf8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
+USE master
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'SparkRoseDigital_TemplateDb')
+BEGIN
+  CREATE DATABASE SparkRoseDigital_TemplateDb;
+END;
+GO
+
+USE SparkRoseDigital_TemplateDb;
+GO
+
+IF NOT EXISTS (SELECT 1
+                 FROM sys.server_principals
+                WHERE [name] = N'SparkRoseDigital_TemplateDb_Login' 
+                  AND [type] IN ('C','E', 'G', 'K', 'S', 'U'))
+BEGIN
+    CREATE LOGIN SparkRoseDigital_TemplateDb_Login
+        WITH PASSWORD = 'Pa$$w0rd_1337';
+END;
+GO  
+
+IF NOT EXISTS (select * from sys.database_principals where name = 'SparkRoseDigital_TemplateDb_User')
+BEGIN
+    CREATE USER SparkRoseDigital_TemplateDb_User FOR LOGIN SparkRoseDigital_TemplateDb_Login;
+END;
+GO  
+
+
+EXEC sp_addrolemember N'db_datareader', N'SparkRoseDigital_TemplateDb_User';
+GO
+
+EXEC sp_addrolemember N'db_datawriter', N'SparkRoseDigital_TemplateDb_User';
+GO
+
+EXEC sp_addrolemember N'db_ddladmin', N'SparkRoseDigital_TemplateDb_User';
+GO

@@ -1,7 +1,9 @@
 version: '3.7'
 
 volumes:
-  pgdata:
+  data:
+  log:
+  secrets:
 
 services:
   reverseproxy:
@@ -34,18 +36,38 @@ services:
     networks:
       - sparkrosedigital_templatenet
   sparkrosedigital_template.sql:
-    image: postgres:12-buster
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      ACCEPT_EULA: Y
+      SA_PASSWORD: ${DB_ADMIN_PASSWORD}
+      MSSQL_PID: Standard
+    user: root
     ports:
-      - "5432:5432"
+      - "1433:1433"
     expose:
-      - "5432"
-    command: "-p 5432"
+      - "1433"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./sql/InitializeSparkRoseDigital_TemplateDb.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - ./sql:/scripts/
+      - data:/var/opt/mssql/data
+      - log:/var/opt/mssql/log
+      - secrets:/var/opt/mssql/secrets
+    command:
+      - /bin/bash
+      - -c
+      - |
+        # Launch MSSQL and send to background
+        /opt/mssql/bin/sqlservr &
+        # Wait 30 seconds for it to be available
+        # (lame, I know, but there's no nc available to start prodding network ports)
+        sleep 30
+        # Run every script in /scripts
+        # TODO set a flag so that this is only done once on creation,
+        #      and not every time the container runs
+        for foo in /scripts/*.sql
+          do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$foo
+        done
+        # So that the container doesn't shut down, sleep this thread
+        sleep infinity
     networks:
       - sparkrosedigital_templatenet
   # Comment the below service back in if you want

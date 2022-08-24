@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using DbUp;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 
 namespace SparkRoseDigital_Template.Migrations
 {
@@ -21,12 +21,12 @@ namespace SparkRoseDigital_Template.Migrations
 
             var config = builder.Build();
 
-            var connectionStringSparkRoseDigital_Template = new NpgsqlConnectionStringBuilder(
+            var connectionStringSparkRoseDigital_Template = new SqlConnectionStringBuilder(
                 string.IsNullOrWhiteSpace(args.FirstOrDefault())
-                    ? config["ConnectionStrings:SparkRoseDigital_TemplateDbConnection"]
+                    ? config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"]
                     : args.FirstOrDefault())
             {
-                Username = config["DB_USER"],
+                UserID = config["DB_USER"],
                 Password = config["DB_PASSWORD"]
             }.ConnectionString;
 
@@ -38,7 +38,7 @@ namespace SparkRoseDigital_Template.Migrations
 
             var upgraderSparkRoseDigital_Template =
                 DeployChanges.To
-                    .PostgresqlDatabase(connectionStringSparkRoseDigital_Template)
+                    .SqlDatabase(connectionStringSparkRoseDigital_Template)
                     .WithScriptsFromFileSystem(
                         !string.IsNullOrWhiteSpace(scriptsPath)
                                 ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateScripts")
@@ -46,11 +46,6 @@ namespace SparkRoseDigital_Template.Migrations
                     .LogToConsole()
                     .Build();
             Console.WriteLine($"Now upgrading SparkRoseDigital_Template.");
-            if (env != "Development")
-            {
-                Console.WriteLine($"Skipping 0005_InitialData.sql since we are not in Development environment.");
-                upgraderSparkRoseDigital_Template.MarkAsExecuted("0005_InitialData.sql");
-            }
             var resultSparkRoseDigital_Template = upgraderSparkRoseDigital_Template.PerformUpgrade();
 
             if (!resultSparkRoseDigital_Template.Successful)
@@ -72,7 +67,7 @@ namespace SparkRoseDigital_Template.Migrations
 
             var upgraderSparkRoseDigital_TemplateIdentity =
                 DeployChanges.To
-                    .PostgresqlDatabase(connectionStringSparkRoseDigital_TemplateIdentity)
+                    .SqlDatabase(connectionStringSparkRoseDigital_TemplateIdentity)
                     .WithScriptsFromFileSystem(
                         scriptsPath != null
                             ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateIdentityScripts")

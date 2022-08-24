@@ -1,15 +1,31 @@
-CREATE DATABASE SparkRoseDigital_TemplateDb;
-GO  
+USE master
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'SparkRoseDigital_TemplateDb')
+BEGIN
+  CREATE DATABASE SparkRoseDigital_TemplateDb;
+END;
+GO
 
 USE SparkRoseDigital_TemplateDb;
-GO  
-
-CREATE LOGIN SparkRoseDigital_TemplateDb_Login
-    WITH PASSWORD = 'Pa$$w0rd_1337';
-GO  
-
-CREATE USER SparkRoseDigital_TemplateDb_User FOR LOGIN SparkRoseDigital_TemplateDb_Login;
 GO
+
+IF NOT EXISTS (SELECT 1
+                 FROM sys.server_principals
+                WHERE [name] = N'SparkRoseDigital_TemplateDb_Login' 
+                  AND [type] IN ('C','E', 'G', 'K', 'S', 'U'))
+BEGIN
+    CREATE LOGIN SparkRoseDigital_TemplateDb_Login
+        WITH PASSWORD = 'Pa$$w0rd_1337';
+END;
+GO  
+
+IF NOT EXISTS (select * from sys.database_principals where name = 'SparkRoseDigital_TemplateDb_User')
+BEGIN
+    CREATE USER SparkRoseDigital_TemplateDb_User FOR LOGIN SparkRoseDigital_TemplateDb_Login;
+END;
+GO  
+
 
 EXEC sp_addrolemember N'db_datareader', N'SparkRoseDigital_TemplateDb_User';
 GO

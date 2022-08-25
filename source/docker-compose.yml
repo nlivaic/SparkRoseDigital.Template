@@ -63,8 +63,12 @@ services:
         # Run every script in /scripts
         # TODO set a flag so that this is only done once on creation,
         #      and not every time the container runs
-        for foo in /scripts/*.sql
-          do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$foo
+        cd scripts
+        for original_script in *.sql
+          do sed -e "s/<DB_PASSWORD>/$DB_PASSWORD/g" $$original_script > ../etc/$$original_script
+        done
+        for bound_script in /etc/*.sql
+          do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$bound_script
         done
         # So that the container doesn't shut down, sleep this thread
         sleep infinity

@@ -16,7 +16,7 @@ IF NOT EXISTS (SELECT 1
                   AND [type] IN ('C','E', 'G', 'K', 'S', 'U'))
 BEGIN
     CREATE LOGIN SparkRoseDigital_TemplateDb_Login
-        WITH PASSWORD = 'Pa$$w0rd_1337';
+        WITH PASSWORD = '<DB_PASSWORD>';
 END;
 GO  
 

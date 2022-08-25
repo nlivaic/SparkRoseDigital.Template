@@ -14,7 +14,7 @@ Create a new namespace, with two Shared access policies, one for reading (called
 
 ### Set configuration
 
-Most of the stuff is in the `.env` file. This is a git ignored file, but it has the relevant structure in it. Some of the fields are prepopulated, others have to be provided by you:
+Most of the stuff is in the `.env` file. This is a git ignored file, but it has the relevant structure in it. Some of the fields are prepopulated, others have to be provided by you. Execute `./configure.ps1` from the root folder and follow the instructions. It helps if you have the following beforehand:
 
 - Connection strings and details for the Service Bus (details above).
 - Username and password for the email are provided as default values, but you can provide whatever values you want.
@@ -36,13 +36,13 @@ Make sure to set the `docker-compose` as the startup project. The application ca
 
 At this point you have several things up and running:
 
-- API
-- Worker service
-- Empty Sql Server database.
-- Azure Service bus with several topics, subscriptions and queues.
-- nginx reverse proxy
-- Smtp fake email server
-- Seq log management service
+- API (dockerized)
+- Worker service (dockerized)
+- Empty Sql Server database (dockerized)
+- Azure Service bus with several topics, subscriptions and queues
+- nginx reverse proxy in `docker-compose.yml`
+- Smtp fake email server in `docker-compose.yml`
+- Seq log management service in `docker-compose.yml`
 
 Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the SSMS and register your database server there. It is accessible on localhost, port 1433, with the username and password you set in your `.env` file under `DB_USER` and `DB_PASSWORD`.
 

@@ -173,6 +173,7 @@ namespace SparkRoseDigital_Template.Api
 
                     // enable the bus outbox
                     o.UseBusOutbox();
+                    o.QueryDelay = TimeSpan.FromSeconds(15);
                 });
             });
             services.AddSparkRoseDigital_TemplateApplicationHandlers();

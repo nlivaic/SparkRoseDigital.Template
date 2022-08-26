@@ -76,7 +76,7 @@ namespace SparkRoseDigital_Template.Api
                     UserID = _configuration["DB_USER"] ?? string.Empty,
                     Password = _configuration["DB_PASSWORD"] ?? string.Empty
                 };
-                options.UseSqlServer(connString.ConnectionString);
+                options.UseSqlServer(connString.ConnectionString, providerOptions => providerOptions.EnableRetryOnFailure());
                 if (_hostEnvironment.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging(true);

@@ -61,8 +61,6 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
                 var scopedServices = scope.ServiceProvider;
-                //var harness = scopedServices.GetRequiredService<ITestHarness>();
-                //harness.Start().GetAwaiter().GetResult();
                 var ctx = scopedServices.GetRequiredService<SparkRoseDigital_TemplateDbContext>();
                 ctx.Database.EnsureCreated();
                 ctx.Seed();

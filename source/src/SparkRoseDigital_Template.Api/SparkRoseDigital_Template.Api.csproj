@@ -33,6 +33,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" />
+	<PackageReference Include="MassTransit.EntityFrameworkCore" />
   </ItemGroup>
 
   <PropertyGroup>

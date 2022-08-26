@@ -114,6 +114,14 @@ namespace SparkRoseDigital_Template.WorkerServices
                             cfg.UseMessageBrokerTracing();
                             cfg.UseExceptionLogger(services);
                         });
+                        x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
+                        {
+                            // configure which database lock provider to use (Postgres, SqlServer, or MySql)
+                            o.UseSqlServer();
+
+                            // enable the bus outbox
+                            o.UseBusOutbox();
+                        });
                     });
                 });
     }

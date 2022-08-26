@@ -166,6 +166,14 @@ namespace SparkRoseDigital_Template.Api
                     // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
                     // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
                 });
+                x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
+                {
+                    // configure which database lock provider to use (Postgres, SqlServer, or MySql)
+                    o.UseSqlServer();
+
+                    // enable the bus outbox
+                    o.UseBusOutbox();
+                });
             });
             services.AddSparkRoseDigital_TemplateApplicationHandlers();
 

@@ -219,6 +219,7 @@ namespace SparkRoseDigital_Template.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/SparkRoseDigital_TemplateOpenAPISpecification/swagger.json", "SparkRoseDigital_Template API");
+                c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

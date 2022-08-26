@@ -166,6 +166,15 @@ namespace SparkRoseDigital_Template.Api
                     // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
                     // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
                 });
+                x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
+                {
+                    // configure which database lock provider to use (Postgres, SqlServer, or MySql)
+                    o.UseSqlServer();
+
+                    // enable the bus outbox
+                    o.UseBusOutbox();
+                    o.QueryDelay = TimeSpan.FromSeconds(15);
+                });
             });
             services.AddSparkRoseDigital_TemplateApplicationHandlers();
 
@@ -210,6 +219,7 @@ namespace SparkRoseDigital_Template.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/SparkRoseDigital_TemplateOpenAPISpecification/swagger.json", "SparkRoseDigital_Template API");
+                c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

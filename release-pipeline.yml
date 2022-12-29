@@ -4,8 +4,8 @@ pr: none
 # Pipeline resource defined as per https://bit.ly/3PhwhRk
 resources:
   pipelines:
-  - pipeline: build_pipeline        # Used to reference the pipeline reference from other parts of the code.
-    source: build_pipeline  	      # This must match  the build pipeline name in ADO.
+  - pipeline: build-pipeline        # Used to reference the pipeline reference from other parts of the code.
+    source: build-pipeline  	      # This must match  the build pipeline name in ADO.
                                     # By default, pipelines are named after the ADO build pipeline name.
     trigger:
       branches:
@@ -27,7 +27,7 @@ jobs:
           inputs:
             targetType: 'inline'
             script: |
-              $newVersion = "$(resources.pipeline.build_pipeline.runName)"
+              $newVersion = "$(resources.pipeline.build-pipeline.runName)"
               [string] $buildName = "$($newVersion)"
               Write-Host "##vso[build.updatebuildnumber]$buildName"
 
@@ -36,11 +36,11 @@ jobs:
         - task: DownloadPipelineArtifact@2
           inputs:
             buildType: 'specific'
-            definition: build_pipeline
+            definition: build-pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop'
             project: 'SRD.Template'
             downloadPath: '$(Pipeline.Workspace)/drop'
 
-        - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Template.$(resources.pipeline.build_pipeline.runName).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
+        - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Template.$(resources.pipeline.build-pipeline.runName).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
           displayName: 'dotnet nuget push'

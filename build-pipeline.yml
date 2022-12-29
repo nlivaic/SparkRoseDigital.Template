@@ -101,18 +101,3 @@ stages:
           targetPath: '$(Build.ArtifactStagingDirectory)' 
           artifactName: 'drop'
           publishLocation: pipeline
-
-- stage: deploy_to_nuget
-  condition: ne(variables['Build.Reason'], 'PullRequest')
-  jobs:
-    - job: deployToNuget
-      displayName: "deploy to nuget.org"
-      steps:
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          buildType: 'current'
-          artifactName: 'drop'
-          downloadPath: '$(Pipeline.Workspace)/drop'
-      
-      - script: dotnet nuget push $(Pipeline.Workspace)/drop/SparkRoseDigital.Template.$(GitVersion.SemVer).nupkg --api-key $(nuget_api_key) --source https://api.nuget.org/v3/index.json
-        displayName: 'dotnet nuget push'

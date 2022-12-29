@@ -55,6 +55,32 @@ Feature branches strategy is supported out of the box. This strategy expects all
 * `feature/`
 * `fix/`
 
+## Pipelines
+
+There are three Azure YAML pipelines:
+
+* `sparkrosedigital_template-pr_pipeline`
+* `sparkrosedigital_template-build_pipeline`
+* `sparkrosedigital_template-release_pipeline`
+
+All pipelines build and deploy all applications (`Api` and `WorkerServices`) in the solution.
+
+### Additional pipeline configuration
+
+To make the pipelines work you have to set them up in Azure DevOps. I recommend you name the ADO pipelines just like the files are names (minus the `.yml` suffix). This is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
+
+`sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
+
+**All** pipelines works with `master` branch . If you are using `main`, remember to do a search and replace.
+
+## Project naming
+
+All projects have a prefix `SparkRoseDigital_Template` and pipelines latch onto that detail. If you want to start renaming projects, you should also do a search and replace across all the files in the solution. Be careful!
+
+## Versioning
+
+We are using semver and GitVersion. Each commit message gets a suffix (defined in `./githooks/prepare-commit-msg` and recognized in `GitVersion.yml`). `feature/` branch gets a suffix saying GitVersion should bump minor version. `fix/` branch gets a suffix saying GitVersion should bump patch version. Bumping major version needs to be done manually by tagging a commit. We do not embed the version in the assemblies yet. GitVersion depends on `--no-ff` merges to be able to deduce version successfully. Make sure your ADO project enforces this, do not allow developers to merge PRs differently! 
+
 ## Generating cert for your local development box
 
 The template does not use HTTPS, however it can easily be added. There is a `.conf` file in there which you need to tweak to your liking. Then you need to generate `.crt` and `.key` files for Api. These make up the self-signed certificate, and the commands to create the certificate are below, with a dummy password of `rootpw`:

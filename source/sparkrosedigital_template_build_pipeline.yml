@@ -78,7 +78,7 @@ stages:
             echo CommitDate: $(GitVersion.CommitDate)
           displayName: Current Version $(GitVersion.FullSemVer)
 
-        - script: dotnet build --configuration $(buildConfiguration) ./TestAllPipelines.sln
+        - script: dotnet build --configuration $(buildConfiguration) ./SparkRoseDigital_Template.sln
           displayName: 'dotnet build $(buildConfiguration)'
 
         - task: DotNetCoreCLI@2
@@ -89,22 +89,22 @@ stages:
             publishTestResults: true
             configuration: $(buildConfiguration)
         
-        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/TestAllPipelines.Api -c $(buildConfiguration) ./src/TestAllPipelines.Api/TestAllPipelines.Api.csproj
-          displayName: 'dotnet publish TestAllPipelines.Api'
+        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Api -c $(buildConfiguration) ./src/SparkRoseDigital_Template.Api/SparkRoseDigital_Template.Api.csproj
+          displayName: 'dotnet publish SparkRoseDigital_Template.Api'
         
-        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/TestAllPipelines.WorkerServices -c $(buildConfiguration) ./src/TestAllPipelines.WorkerServices/TestAllPipelines.WorkerServices.csproj
-          displayName: 'dotnet publish TestAllPipelines.WorkerServices'
+        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.WorkerServices -c $(buildConfiguration) ./src/SparkRoseDigital_Template.WorkerServices/SparkRoseDigital_Template.WorkerServices.csproj
+          displayName: 'dotnet publish SparkRoseDigital_Template.WorkerServices'
 
         - task: PublishPipelineArtifact@1
-          displayName: 'Publish artifacts TestAllPipelines.Api'
+          displayName: 'Publish artifacts SparkRoseDigital_Template.Api'
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/TestAllPipelines.Api'
-            artifactName: 'drop.TestAllPipelines.Api'
+            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Api'
+            artifactName: 'drop.SparkRoseDigital_Template.Api'
             publishLocation: pipeline
 
         - task: PublishPipelineArtifact@1
-          displayName: 'Publish artifacts TestAllPipelines.WorkerServices'
+          displayName: 'Publish artifacts SparkRoseDigital_Template.WorkerServices'
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/TestAllPipelines.WorkerServices'
-            artifactName: 'drop.TestAllPipelines.WorkerServices'
+            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.WorkerServices'
+            artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
             publishLocation: pipeline

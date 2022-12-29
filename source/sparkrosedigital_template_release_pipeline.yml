@@ -5,15 +5,15 @@ pr: none
 resources:
   pipelines:
   - pipeline: build_pipeline        # Used to reference the pipeline reference from other parts of the code.
-    source: testallpipelines_build_pipeline  	# This must match  the build pipeline name in ADO.
+    source: sparkrosedigital_template_build_pipeline  	# This must match  the build pipeline name in ADO.
                                     # By default, pipelines are named after the ADO build pipeline name.
     trigger:
       branches:
       - master                      # Will get triggered whenever the source pipeline runs on master branch.
 
 jobs:
-- deployment: testallpipelines_deploy_to_appservice
-  displayName: TestAllPipelines Deploy to AppService
+- deployment: sparkrosedigital_template_deploy_to_appservice
+  displayName: SparkRoseDigital_Template Deploy to AppService
   environment: production
   pool:
     vmImage: 'ubuntu-latest'
@@ -34,21 +34,21 @@ jobs:
         - download: none
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact TestAllPipelines.Api'
+          displayName: 'Download Artifact SparkRoseDigital_Template.Api'
           inputs:
             buildType: 'specific'
-            definition: testallpipelines_build_pipeline
+            definition: sparkrosedigital_template_build_pipeline
             buildVersionToDownload: 'latest'
-            artifactName: 'drop.TestAllPipelines.Api'
+            artifactName: 'drop.SparkRoseDigital_Template.Api'
             project: 'DeleteMeAfterYouSetupThosePipelines'
-            downloadPath: '$(Pipeline.Workspace)/drop/TestAllPipelines.Api'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact TestAllPipelines.WorkerServices'
+          displayName: 'Download Artifact SparkRoseDigital_Template.WorkerServices'
           inputs:
             buildType: 'specific'
-            definition: testallpipelines_build_pipeline
+            definition: sparkrosedigital_template_build_pipeline
             buildVersionToDownload: 'latest'
-            artifactName: 'drop.TestAllPipelines.WorkerServices'
+            artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
             project: 'DeleteMeAfterYouSetupThosePipelines'
-            downloadPath: '$(Pipeline.Workspace)/drop/TestAllPipelines.WorkerServices'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.WorkerServices'

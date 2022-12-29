@@ -78,7 +78,7 @@ stages:
           echo CommitDate: $(GitVersion.CommitDate)
         displayName: Current Version $(GitVersion.FullSemVer)
 
-      - script: dotnet build --configuration $(buildConfiguration)
+      - script: dotnet build ./source/SparkRoseDigital_Template.sln --configuration Release
         displayName: 'dotnet build $(buildConfiguration)'
 
       - task: DotNetCoreCLI@2

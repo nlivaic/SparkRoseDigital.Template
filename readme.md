@@ -2,6 +2,10 @@
 
 It is important to keep the `.template.config` folder where it is. `.nuspec` file also must be kept in the same location as it is now.
 
+# After cloning
+
+Make sure to execute `./configure_template.ps1` from the root folder of the template. This will wire up stuff in the `templategithooks` folder.
+
 ## Commands
 
 When making changes to the template, just push to GitHub and Azure Yaml pipelines will take care of building and deploying to NuGet. Version is bumped by the pipeline, but earlier the developer had to do it manually in `/source/.template.config/template.json` and `/SparkRoseDigital.Template.nuspec`. Next thing you have to do is download `nuget.exe` to a folder above the template folder.

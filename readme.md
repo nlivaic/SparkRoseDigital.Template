@@ -6,13 +6,26 @@ It is important to keep the `.template.config` folder where it is. `.nuspec` fil
 
 Make sure to execute `./configure_template.ps1` from the root folder of the template. This will wire up stuff in the `templategithooks` folder.
 
+## Branching strategy
+
+Feature branches strategy is supported out of the box. This strategy expects all development to go through branches and committing directly to `master` is not allowed. Supported branches:
+
+* `feature/`
+* `fix/`
+
 ## Pipelines
 
-Three ADO pipelines are supported. Name the ADO pipelines the same as the files are named (but without the `.yml` suffix):
+There are three Azure YAML pipelines:
 
-* `template_pr_pipeline.yml`
-* `template_build_pipeline.yml`
-* `template_release_pipeline.yml`
+* `sparkrosedigital_template-pr_pipeline`
+* `sparkrosedigital_template-build_pipeline`
+* `sparkrosedigital_template-release_pipeline`
+
+All pipelines build and deploy all applications (`Api` and `WorkerServices`) in the solution.
+
+When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix).
+
+`template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
 
 ## Commands
 

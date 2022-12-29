@@ -2,9 +2,17 @@
 
 It is important to keep the `.template.config` folder where it is. `.nuspec` file also must be kept in the same location as it is now.
 
-# After cloning
+## After cloning
 
 Make sure to execute `./configure_template.ps1` from the root folder of the template. This will wire up stuff in the `templategithooks` folder.
+
+## Pipelines
+
+Three ADO pipelines are supported. Name the ADO pipelines the same as the files are named (but without the `.yml` suffix):
+
+* `template_pr_pipeline.yml`
+* `template_build_pipeline.yml`
+* `template_release_pipeline.yml`
 
 ## Commands
 

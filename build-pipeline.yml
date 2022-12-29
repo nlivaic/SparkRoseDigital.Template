@@ -102,22 +102,6 @@ stages:
           artifactName: 'drop'
           publishLocation: pipeline
 
-# build must be approved before getting pushed to nuget
-- stage: wait_for_approval
-  pool: server
-  condition: ne(variables['Build.Reason'], 'PullRequest')
-  jobs:
-    - job: waitForApproval
-      displayName: 'wait for approval'
-      # timeoutInMinutes: 1440    # 3 days before the build is rejected
-      steps:
-      - task: ManualValidation@0
-        # timeoutInMinutes: 1440    # 3 days before the task is rejected.
-        inputs:
-          notifyUsers: $(notify_user_for_approval_1)
-          instructions: 'Please validate the build before pushing to nuget.org'
-          onTimeout: reject
-
 - stage: deploy_to_nuget
   condition: ne(variables['Build.Reason'], 'PullRequest')
   jobs:

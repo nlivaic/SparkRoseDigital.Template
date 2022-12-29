@@ -95,4 +95,4 @@ stages:
           displayName: 'nuget pack'
           inputs:
             command: 'custom'
-            arguments: 'pack ./SparkRoseDigital.Template.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -Properties Configuration=Release -version $(nugetVersion) -Verbosity Detailed -NoDefaultExcludes'
+            arguments: 'pack ./SparkRoseDigital.Template.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -Properties Configuration=Release -version $(GitVersion.SemVer) -Verbosity Detailed -NoDefaultExcludes'

@@ -59,19 +59,21 @@ Feature branches strategy is supported out of the box. This strategy expects all
 
 There are three Azure YAML pipelines:
 
-* `sparkrosedigital_template-pr_pipeline`
-* `sparkrosedigital_template-build_pipeline`
-* `sparkrosedigital_template-release_pipeline`
+* `sparkrosedigital_template_pr_pipeline`
+* `sparkrosedigital_template_build_pipeline`
+* `sparkrosedigital_template_release_pipeline`
 
 All pipelines build and deploy all applications (`Api` and `WorkerServices`) in the solution.
 
+When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix).
+
 ### Additional pipeline configuration
 
-To make the pipelines work you have to set them up in Azure DevOps. I recommend you name the ADO pipelines just like the files are names (minus the `.yml` suffix). This is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
+Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
 
 `sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
 
-**All** pipelines works with `master` branch . If you are using `main`, remember to do a search and replace.
+**All** pipelines work with `master` branch . If you are using `main`, remember to do a search and replace.
 
 ## Project naming
 

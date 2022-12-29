@@ -48,6 +48,13 @@ Now it is time to create some tables in the database. From the root of your solu
 
 # Additional Stuff
 
+## Branching strategy
+
+Feature branches strategy is supported out of the box. This strategy expects all development to go through branches and committing directly to `master` is not allowed. Supported branches:
+
+* `feature/`
+* `fix/`
+
 ## Generating cert for your local development box
 
 The template does not use HTTPS, however it can easily be added. There is a `.conf` file in there which you need to tweak to your liking. Then you need to generate `.crt` and `.key` files for Api. These make up the self-signed certificate, and the commands to create the certificate are below, with a dummy password of `rootpw`:

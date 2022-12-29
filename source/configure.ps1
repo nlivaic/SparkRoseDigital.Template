@@ -51,3 +51,5 @@ if (![string]::IsNullOrWhiteSpace($msg_broker_read_policy)) {
 if (![string]::IsNullOrWhiteSpace($msg_broker_write_policy)) {
     (Get-Content ".env").replace("<msg_broker_write_policy>", $msg_broker_write_policy) | Set-Content ".env"
 }
+
+git config core.hooksPath "./githooks"

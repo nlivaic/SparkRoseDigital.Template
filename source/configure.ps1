@@ -52,4 +52,8 @@ if (![string]::IsNullOrWhiteSpace($msg_broker_write_policy)) {
     (Get-Content ".env").replace("<msg_broker_write_policy>", $msg_broker_write_policy) | Set-Content ".env"
 }
 
+git init
+git add .gitignore
+git commit -m "gitignore"
+
 git config core.hooksPath "./githooks"

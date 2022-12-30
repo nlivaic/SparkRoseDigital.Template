@@ -42,6 +42,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		migrate.ps1 = migrate.ps1
 		nuget.config = nuget.config
+		sparkrosedigital_template_build_pipeline.yml = sparkrosedigital_template_build_pipeline.yml
+		sparkrosedigital_template_pr_pipeline.yml = sparkrosedigital_template_pr_pipeline.yml
+		sparkrosedigital_template_release_pipeline.yml = sparkrosedigital_template_release_pipeline.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.Api.Tests", "tests\SparkRoseDigital_Template.Api.Tests\SparkRoseDigital_Template.Api.Tests.csproj", "{A2A4A54E-156C-41A9-AB47-58F58B3CDB68}"

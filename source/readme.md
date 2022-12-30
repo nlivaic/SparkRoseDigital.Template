@@ -1,3 +1,37 @@
+# How to get started
+
+> All the steps outlined here are detailed further on down in the document.
+
+1. Run docker-desktop
+2. Configure Azure Service Bus
+3. Run `./configure.ps1`
+4. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
+5. Run `./create_migration.ps1 '' 'Initial migration'`
+6. Run `./migrate.ps1`
+7. Go to http://localhost:44395/index.html
+
+At this point only `.gitignore` has been committed. Now you can make some changes to the source code:
+
+1. `git checkout -b feature/initial; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial`
+2. You can remove or update some of the endpoints and models if you like.
+3. Open `sparkrosedigital_template_release_pipeline.yml` and set the name of your ADO project on line 43 (just search for `SparkRoseDigital_Template_ADO_Project` and rename it).
+3. Create and approve PR
+3. `git checkout master; git pull`
+
+Now configure the pipelines on ADO:
+
+1. Add three new pipelines: `sparkrosedigital_template_build_pipeline`, `sparkrosedigital_template_pr_pipeline`, `sparkrosedigital_template_release_pipeline`.
+
+Setup your AppServices:
+
+1. To do
+
+Setup your Azure SQL:
+
+1. To do
+
+At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
+
 # Before You Get Started
 
 ## Install a Docker host

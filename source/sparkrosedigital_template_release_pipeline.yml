@@ -40,7 +40,7 @@ jobs:
             definition: sparkrosedigital_template_build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.Api'
-            project: 'DeleteMeAfterYouSetupThosePipelines'
+            project: 'SparkRoseDigital_Template_ADO_Project'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api'
 
         - task: DownloadPipelineArtifact@2

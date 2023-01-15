@@ -13,6 +13,7 @@
     <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" />
+	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

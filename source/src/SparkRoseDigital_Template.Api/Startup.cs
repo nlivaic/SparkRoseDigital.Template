@@ -90,6 +90,7 @@ namespace SparkRoseDigital_Template.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLoggingScopes();
+            services.AddApplicationInsightsTelemetry();
             services.AddAutoMapper(Assembly.GetExecutingAssembly(), typeof(Startup).Assembly);
 
             services.AddSingleton<ICache, Cache>();

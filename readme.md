@@ -2,9 +2,7 @@
 
 It is important to keep the `.template.config` folder where it is. `.nuspec` file also must be kept in the same location as it is now.
 
-## After cloning
-
-Make sure to execute `./configure_template.ps1` from the root folder of the template. This will wire up stuff in the `templategithooks` folder.
+Make sure to execute `./configure_template.ps1` from the root folder of the template after cloning the repository to a local folder. This will wire up stuff in the `templategithooks` folder.
 
 ## Branching strategy
 

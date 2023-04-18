@@ -1,11 +1,15 @@
 using System;
 using System.Reflection;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using MassTransit;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using SparkRoseDigital.Infrastructure.Caching;
 using SparkRoseDigital.Infrastructure.Logging;
@@ -17,6 +21,7 @@ using SparkRoseDigital_Template.Core.Events;
 using SparkRoseDigital_Template.Data;
 using SparkRoseDigital_Template.WorkerServices.FaultService;
 using SparkRoseDigital_Template.WorkerServices.FooService;
+using LoggerExtensions = SparkRoseDigital.Infrastructure.Logging.LoggerExtensions;
 
 namespace SparkRoseDigital_Template.WorkerServices
 {
@@ -24,7 +29,7 @@ namespace SparkRoseDigital_Template.WorkerServices
     {
         public static void Main(string[] args)
         {
-            SparkRoseDigital.Infrastructure.Logging.LoggerExtensions.ConfigureSerilogLogger("DOTNET_ENVIRONMENT");
+            LoggerExtensions.ConfigureSerilogLogger("ASPNETCORE_ENVIRONMENT");
 
             try
             {
@@ -123,6 +128,40 @@ namespace SparkRoseDigital_Template.WorkerServices
                             o.UseBusOutbox();
                         });
                     });
+
+                    services
+                        .AddOpenTelemetry()
+                        .WithTracing(tracerProviderBuilder =>
+                        {
+                            tracerProviderBuilder
+                                .AddSource(WorkerAssemblyInfo.Value.GetName().Name)
+                                .SetResourceBuilder(
+                                    ResourceBuilder
+                                        .CreateDefault()
+                                        .AddService(serviceName: WorkerAssemblyInfo.Value.GetName().Name))
+                                .AddEntityFrameworkCoreInstrumentation()
+                                .AddSqlClientInstrumentation()
+                                .AddSource("MassTransit")
+                                .AddAzureMonitorTraceExporter(o =>
+                                {
+                                    o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                });
+                        })//.WithMetrics(meterProviderBuilder =>
+                          //{
+                          //    meterProviderBuilder
+                          //        .SetResourceBuilder(
+                          //            ResourceBuilder
+                          //                .CreateDefault()
+                          //                .AddService(serviceName: "TestTemplate2"))
+                          //        .AddAspNetCoreInstrumentation()
+                          //        .AddAzureMonitorMetricExporter(o =>
+                          //        {
+                          //            //o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91";
+                          //            o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/";
+                          //        })
+                          //        .AddConsoleExporter();
+                          //})
+                        .StartWithHost();
                 });
     }
 }

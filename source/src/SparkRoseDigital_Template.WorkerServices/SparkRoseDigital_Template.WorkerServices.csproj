@@ -13,6 +13,7 @@
     <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.Azure.ServiceBus.Core" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" />
+	<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -23,14 +24,19 @@
     <PackageReference Include="Serilog.Exceptions" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Settings.Configuration" />
+	<PackageReference Include="Serilog.Sinks.ApplicationInsights" />
     <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="Serilog.Sinks.Seq" />
     <PackageReference Include="SparkRoseDigital.Infrastructure" />
     <PackageReference Include="StyleCop.Analyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
 	<PackageReference Include="MassTransit.EntityFrameworkCore" />
+	<PackageReference Include="OpenTelemetry" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+	<PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
-using Xunit;
 
 namespace SparkRoseDigital_Template.Api.Tests.Helpers
 {
-    public class MsSqlTests : IAsyncLifetime
+    public class MsSqlContainer
     {
         private const string _database = "master";
         private const string _username = "sa";
@@ -18,7 +17,11 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
             .WithEnvironment("SQLCMDUSER", _username)
             .WithEnvironment("SQLCMDPASSWORD", _password)
             .WithEnvironment("MSSQL_SA_PASSWORD", _password)
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilCommandIsCompleted("/opt/mssql-tools/bin/sqlcmd", "-Q", "SELECT 1;"))
+            .WithWaitStrategy(
+                Wait.ForUnixContainer().UntilCommandIsCompleted(
+                    "/opt/mssql-tools/bin/sqlcmd",
+                    "-Q",
+                    "SELECT 1;"))
             .Build();
         public string ConnectionString =>
             $"Server={_mssqlContainer.Hostname},{_mssqlContainer.GetMappedPublicPort(_msSqlPort)};" +

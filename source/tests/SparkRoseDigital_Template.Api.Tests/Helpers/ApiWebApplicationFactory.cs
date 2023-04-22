@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SparkRoseDigital_Template.Data;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SparkRoseDigital_Template.Api.Tests.Helpers
 {
@@ -20,8 +23,7 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
         IAsyncLifetime
     {
         private readonly MsSqlContainer _msSqlContainer;
-
-        public string ConnectionString => _msSqlContainer.ConnectionString;
+        private MsSqlDbBuilder _msSqlDbBuilder;
 
         public ApiWebApplicationFactory()
         {
@@ -67,11 +69,48 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
             });
         }
 
+        public SparkRoseDigital_TemplateDbContext CreateDbContext(ITestOutputHelper testOutput = null)
+        {
+            _msSqlDbBuilder ??= new MsSqlDbBuilder(testOutput, _msSqlContainer.ConnectionString);
+            return _msSqlDbBuilder.BuildContext();
+        }
+
         public async Task InitializeAsync() =>
             await _msSqlContainer.InitializeAsync();
 
         public async Task DisposeAsync() =>
             await _msSqlContainer.DisposeAsync();
 
+
+        private class MsSqlDbBuilder
+        {
+            private readonly DbContextOptions<SparkRoseDigital_TemplateDbContext> _options;
+
+            /// <summary>
+            /// Creates a new DbContext with an open database connection already set up.
+            /// Make sure not to call `context.Database.OpenConnection()` from your code.
+            /// </summary>
+            public MsSqlDbBuilder(
+                ITestOutputHelper testOutput,
+                string connection,
+                List<string> logs = null)   // This parameter is just for demo purposes, to show you can output logs.
+            {
+                _options = new DbContextOptionsBuilder<SparkRoseDigital_TemplateDbContext>()
+                    .UseLoggerFactory(new LoggerFactory(
+                        new[] {
+                        new TestLoggerProvider(
+                            message => testOutput?.WriteLine(message),
+                            // message => logs?.Add(message),
+                            LogLevel.Information
+                        )
+                        }
+                    ))
+                    .UseSqlServer(connection)
+                    .Options;
+            }
+
+            public SparkRoseDigital_TemplateDbContext BuildContext() =>
+                new(_options);
+        }
     }
 }

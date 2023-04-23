@@ -3,20 +3,21 @@ using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Testing;
 using SparkRoseDigital_Template.Api.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace SparkRoseDigital_Template.Api.Tests
 {
-    public class ApiIntegrationTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class ApiIntegrationTests : IClassFixture<ApiWebApplicationFactory>
     {
         private readonly ITestOutputHelper _testOutput;
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly ApiWebApplicationFactory _factory;
 
         public ApiIntegrationTests(
             ITestOutputHelper testOutput,
-            CustomWebApplicationFactory<Startup> factory)
+            ApiWebApplicationFactory factory)
         {
             factory.ClientOptions.BaseAddress = new Uri("http://localhost/api/");
             _testOutput = testOutput;
@@ -28,7 +29,7 @@ namespace SparkRoseDigital_Template.Api.Tests
         {
             // Arrange
             var client = _factory.CreateClient();
-            using var ctx = new SQLiteDbBuilder(_testOutput, _factory.KeepAliveConnection).BuildContext();
+            using var ctx = _factory.CreateDbContext(_testOutput);
             var initialCount = ctx.Foos.Count();
 
             // Act
@@ -36,7 +37,7 @@ namespace SparkRoseDigital_Template.Api.Tests
             {
                 Text = "My_Test_Title"
             });
-            using var ctx1 = new SQLiteDbBuilder(_testOutput, _factory.KeepAliveConnection).BuildContext();
+            using var ctx1 = _factory.CreateDbContext(_testOutput);
 
             // Assert
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -50,7 +51,7 @@ namespace SparkRoseDigital_Template.Api.Tests
             var client = _factory.CreateClient();
 
             // Act
-            using var ctx = new SQLiteDbBuilder(_testOutput, _factory.KeepAliveConnection).BuildContext();
+            using var ctx = _factory.CreateDbContext(_testOutput);
             var response = await client.PostAsJsonAsync("foos", new
             {
                 Text = "Text 1"

@@ -82,6 +82,12 @@ stages:
 
         - script: dotnet build ./source/SparkRoseDigital_Template.sln --configuration Release
           displayName: 'dotnet build $(buildConfiguration)'
+        
+        - task: DockerInstaller@0
+          displayName: Docker Installer
+          inputs:
+            dockerVersion: 17.09.0-ce
+            releaseType: stable
 
         - task: DotNetCoreCLI@2
           displayName: 'dotnet test'

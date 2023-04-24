@@ -112,7 +112,7 @@ namespace SparkRoseDigital_Template.Api
                         .AddSource("MassTransit")
                         .AddAzureMonitorTraceExporter(o =>
                         {
-                            o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                            o.ConnectionString = "";// _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
                         });
                 })
                 // Not supported by Application Insights yet.

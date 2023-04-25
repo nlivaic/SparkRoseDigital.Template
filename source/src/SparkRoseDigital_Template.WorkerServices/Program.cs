@@ -29,7 +29,7 @@ namespace SparkRoseDigital_Template.WorkerServices
     {
         public static void Main(string[] args)
         {
-            LoggerExtensions.ConfigureSerilogLogger("ASPNETCORE_ENVIRONMENT");
+            LoggerExtensions.ConfigureSerilogLogger("DOTNET_ENVIRONMENT");
 
             try
             {

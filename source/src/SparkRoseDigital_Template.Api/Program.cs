@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SparkRoseDigital.Infrastructure.Logging;
+using LoggerExtensions = SparkRoseDigital.Infrastructure.Logging.LoggerExtensions;
 
 namespace SparkRoseDigital_Template.Api
 {
@@ -10,7 +11,7 @@ namespace SparkRoseDigital_Template.Api
     {
         public static void Main(string[] args)
         {
-            SparkRoseDigital.Infrastructure.Logging.LoggerExtensions.ConfigureSerilogLogger("ASPNETCORE_ENVIRONMENT");
+            LoggerExtensions.ConfigureSerilogLogger("ASPNETCORE_ENVIRONMENT");
 
             try
             {

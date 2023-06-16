@@ -98,15 +98,6 @@ services:
       dockerfile: src/SparkRoseDigital_Template.WorkerServices/Dockerfile
     networks:
       - sparkrosedigital_templatenet
-  sparkrosedigital_template.seq:
-    ports:
-      - "5341:80"
-    image: datalust/seq
-    restart: unless-stopped
-    environment:
-      - ACCEPT_EULA=Y
-    networks:
-      - sparkrosedigital_templatenet
   sparkrosedigital_template.smtp:
     ports:
       - "5010:80"

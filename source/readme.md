@@ -4,11 +4,12 @@
 
 1. Run docker-desktop
 2. Configure Azure Service Bus
-3. Run `./configure.ps1`
-4. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
-5. Run `./create_migration.ps1 '' 'Initial migration'`
-6. Run `./migrate.ps1`
-7. Go to http://localhost:44395/index.html
+3. Configure Application Insights.
+4. Run `./configure.ps1`
+5. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
+6. Run `./create_migration.ps1 '' 'Initial migration'`
+7. Run `./migrate.ps1`
+8. Go to http://localhost:44395/index.html
 
 At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code:
 
@@ -43,7 +44,11 @@ E.g. Docker Desktop:
 
 ## Configure Azure Service Bus
 
-Create a new namespace, with two Shared access policies, one for reading (called "ReaderPolicy") and one for writing (called "WriterPolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://yourApplicationName.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
+Create a new namespace, with two Shared access policies, one for reading (called "ReadPolicy") and one for writing (called "WritePolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://yourApplicationName.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
+
+## Configure Application Insights
+
+Create a new Application Insights. If you are building a distributed system then reuse an existing one. Just make sure to copy/paste the connection string instead of instrumentation key.
 
 ## Configuration
 

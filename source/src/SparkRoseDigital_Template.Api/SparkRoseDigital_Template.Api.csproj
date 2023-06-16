@@ -26,14 +26,21 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Enrichers.Span" />
     <PackageReference Include="Serilog.Exceptions" />
-    <PackageReference Include="Serilog.Sinks.Seq" />
+	<PackageReference Include="Serilog.Sinks.ApplicationInsights" />
     <PackageReference Include="SparkRoseDigital.Infrastructure" />
+	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
     <PackageReference Include="StyleCop.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" />
 	<PackageReference Include="MassTransit.EntityFrameworkCore" />
+	<PackageReference Include="OpenTelemetry" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+	<PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,7 +1,7 @@
 Write-Output "Please enter following information to configure SparkRoseDigital_Template application."
 Write-Output "Values you provide here will be bound to .env file."
 Write-Output "Default values are provided for usernames and passwords, but you can enter a different value if you like."
-Write-Output "Some inputs do not have default values, you will probably have to get these yourself from external systems."
+Write-Output "Some inputs do not have default values, you will probably have to get these yourself from external systems (Azure)."
 Write-Output "You can rerun the script but only the values you are entering for the first time will be applied to the .env file."
 Write-Output "If you want to edit a previously provided value, it is best to edit .env file manually."
 
@@ -24,8 +24,11 @@ if (!($db_pw = Read-Host "Database user password [$db_pw_default]")) { $db_pw = 
 $msg_broker_connection_string = Read-Host -Prompt 'Message broker connection string (Azure Service Bus)'
 # Message broker read policy
 $msg_broker_read_policy = Read-Host -Prompt 'Message broker read policy (Azure Service Bus)'
-#Message broker write policy
+# Message broker write policy
 $msg_broker_write_policy = Read-Host -Prompt 'Message broker write policy (Azure Service Bus)'
+# Azure Application Insights Connection String
+$applicationinsights_connection_string = Read-Host -Prompt 'Application Insights connection string (Azure)'
+
 
 if (![string]::IsNullOrWhiteSpace($smtp_user)) {
     (Get-Content ".env").replace("<smtp_user>", $smtp_user) | Set-Content ".env"
@@ -50,6 +53,9 @@ if (![string]::IsNullOrWhiteSpace($msg_broker_read_policy)) {
 }
 if (![string]::IsNullOrWhiteSpace($msg_broker_write_policy)) {
     (Get-Content ".env").replace("<msg_broker_write_policy>", $msg_broker_write_policy) | Set-Content ".env"
+}
+if (![string]::IsNullOrWhiteSpace($applicationinsights_connection_string)) {
+    (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
 }
 
 git init

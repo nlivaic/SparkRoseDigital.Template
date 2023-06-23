@@ -107,13 +107,23 @@ All pipelines build and deploy all applications (`Api` and `WorkerServices`) in 
 
 When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix).
 
-### Additional pipeline configuration
+### Naming the pipelines
 
 Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
 
+### Naming the ADO project
+
 `sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
 
+### Branches
+
 **All** pipelines work with `master` branch . If you are using `main`, remember to do a search and replace.
+
+### Azure Service Connection
+
+In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name - make sure the name is correct.
+
+If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html).
 
 ## Project naming
 

@@ -20,6 +20,8 @@ stages:
       - checkout: self
         fetchDepth: 0
 
+      - script: echo $DB_USER
+
       - script: echo $(version)
         displayName: 'Basic Information - Version'
         

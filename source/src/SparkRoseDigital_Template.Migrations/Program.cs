@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using DbUp;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +10,11 @@ namespace SparkRoseDigital_Template.Migrations
     {
         public static int Main(string[] args)
         {
+            var connectionString = string.Empty;
+            var dbUser = string.Empty;
+            var dbPassword = string.Empty;
+            var scriptsPath = string.Empty;
+
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
                 ?? "Development";
             Console.WriteLine($"Environment: {env}.");
@@ -20,21 +24,12 @@ namespace SparkRoseDigital_Template.Migrations
                 .AddEnvironmentVariables();
 
             var config = builder.Build();
-
-            var connectionStringSparkRoseDigital_Template = new SqlConnectionStringBuilder(
-                string.IsNullOrWhiteSpace(args.FirstOrDefault())
-                    ? config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"]
-                    : args.FirstOrDefault())
+            InitializeParameters();
+            var connectionStringSparkRoseDigital_Template = new SqlConnectionStringBuilder(connectionString)
             {
-                UserID = config["DB_USER"],
-                Password = config["DB_PASSWORD"]
+                UserID = dbUser,
+                Password = dbPassword
             }.ConnectionString;
-
-            string scriptsPath = null;
-            if (args.Length == 3)
-            {
-                scriptsPath = args[2];
-            }
 
             var upgraderSparkRoseDigital_Template =
                 DeployChanges.To
@@ -53,9 +48,6 @@ namespace SparkRoseDigital_Template.Migrations
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"SparkRoseDigital_Template upgrade error: {resultSparkRoseDigital_Template.Error}");
                 Console.ResetColor();
-#if DEBUG
-                Console.ReadLine();
-#endif
                 return -1;
             }
 
@@ -89,9 +81,6 @@ namespace SparkRoseDigital_Template.Migrations
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"SparkRoseDigital_Template Identity upgrade error: {resultSparkRoseDigital_TemplateIdentity.Error}");
                 Console.ResetColor();
-#if DEBUG
-                Console.ReadLine();
-#endif
                 return -1;
             }
             */
@@ -100,6 +89,23 @@ namespace SparkRoseDigital_Template.Migrations
             Console.WriteLine("Success!");
             Console.ResetColor();
             return 0;
+
+            void InitializeParameters()
+            {
+                if (args.Length == 0)
+                {
+                    connectionString = config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"];
+                    dbUser = config["DB_USER"];
+                    dbPassword = config["DB_PASSWORD"];
+                }
+                else if (args.Length == 4)
+                {
+                    connectionString = args[0];
+                    dbUser = args[1];
+                    dbPassword = args[2];
+                    scriptsPath = args[3];
+                }
+            }
         }
     }
 }

@@ -17,4 +17,4 @@ RUN dotnet publish "SparkRoseDigital_Template.Migrations.csproj" -c Release -o /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SparkRoseDigital_Template.Migrations.dll", " ", " ", " "]
+ENTRYPOINT ["dotnet", "SparkRoseDigital_Template.Migrations.dll"]

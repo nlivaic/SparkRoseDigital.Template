@@ -97,7 +97,11 @@ Feature branches strategy is supported out of the box. This strategy expects all
 
 ## Pipelines
 
-There are three Azure YAML pipelines:
+### Naming the ADO project
+
+`sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
+
+### Azure YAML pipelines:
 
 * `sparkrosedigital_template_pr_pipeline`
 * `sparkrosedigital_template_build_pipeline`
@@ -105,15 +109,11 @@ There are three Azure YAML pipelines:
 
 All pipelines build and deploy all applications (`Api` and `WorkerServices`) in the solution.
 
-When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix).
+When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix). Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
 
-### Naming the pipelines
+### Configure the pipelines
 
-Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
-
-### Naming the ADO project
-
-`sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
+To be able to execute migrations, `sparkrosedigital_template_release_pipeline` pipeline must have several variables defined: `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`, `DB_USER` and `DB_PASSWORD`.
 
 ### Branches
 
@@ -121,7 +121,7 @@ Naming the pipelines same as the files is important because the `sparkrosedigita
 
 ### Azure Service Connection
 
-In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name - make sure the name is correct.
+In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name (`AzureConnection_SparkRoseDigital_Template`) - make sure the name is correct.
 
 If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html).
 

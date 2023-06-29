@@ -53,6 +53,19 @@ jobs:
             project: 'SparkRoseDigital_Template_ADO_Project'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.WorkerServices'
 
+        - task: DownloadPipelineArtifact@2
+          displayName: 'Download Artifact SparkRoseDigital_Template.Migrations'
+          inputs:
+            buildType: 'specific'
+            definition: sparkrosedigital_template_build_pipeline
+            buildVersionToDownload: 'latest'
+            artifactName: 'drop.SparkRoseDigital_Template.Migrations'
+            project: 'SparkRoseDigital_Template_ADO_Project'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations'
+
+        - script: dotnet $(Pipeline.Workspace)/drop/TestTemplate1.Migrations/TestTemplate1.Migrations.dll "$(ConnectionStrings__TestTemplate1Db_Migrations_Connection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/TestTemplate1.Migrations"
+          displayName: 'Migrate database'
+
         - task: AzureWebApp@1
           displayName: 'Deploy SparkRoseDigital_Template.Api to App Service'
           inputs:

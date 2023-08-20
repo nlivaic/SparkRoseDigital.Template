@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		migrate.ps1 = migrate.ps1
 		nuget.config = nuget.config
+		provision.ps1 = provision.ps1
 		sparkrosedigital_template_build_pipeline.yml = sparkrosedigital_template_build_pipeline.yml
 		sparkrosedigital_template_pr_pipeline.yml = sparkrosedigital_template_pr_pipeline.yml
 		sparkrosedigital_template_release_pipeline.yml = sparkrosedigital_template_release_pipeline.yml
@@ -52,6 +53,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.Application.Tests", "tests\SparkRoseDigital_Template.Application.Tests\SparkRoseDigital_Template.Application.Tests.csproj", "{85A04D71-6D24-4519-8406-BF668732F0AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.Common.Tests", "tests\SparkRoseDigital_Template.Common.Tests\SparkRoseDigital_Template.Common.Tests.csproj", "{3B771469-1250-491E-85B4-224A93F7EE20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SparkRoseDigital_Template.Deployment", "SparkRoseDigital_Template.Deployment", "{E288664C-FB95-4F1C-8518-6E05B531A6C7}"
+	ProjectSection(SolutionItems) = preProject
+		src\SparkRoseDigital_Template.Deployment\app-service-plan.bicep = src\SparkRoseDigital_Template.Deployment\app-service-plan.bicep
+		src\SparkRoseDigital_Template.Deployment\resource-group.bicep = src\SparkRoseDigital_Template.Deployment\resource-group.bicep
+		src\SparkRoseDigital_Template.Deployment\sql-server.bicep = src\SparkRoseDigital_Template.Deployment\sql-server.bicep
+		src\SparkRoseDigital_Template.Deployment\variables.ps1 = src\SparkRoseDigital_Template.Deployment\variables.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -118,6 +127,7 @@ Global
 		{A2A4A54E-156C-41A9-AB47-58F58B3CDB68} = {02503073-C5ED-4E0F-B514-626891FC363E}
 		{85A04D71-6D24-4519-8406-BF668732F0AD} = {02503073-C5ED-4E0F-B514-626891FC363E}
 		{3B771469-1250-491E-85B4-224A93F7EE20} = {02503073-C5ED-4E0F-B514-626891FC363E}
+		{E288664C-FB95-4F1C-8518-6E05B531A6C7} = {EF3EF8E4-6B86-49FD-A3FD-ACC2F8293E38}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4562E5E6-BBCC-4BD4-861A-04CFBA1FF76D}

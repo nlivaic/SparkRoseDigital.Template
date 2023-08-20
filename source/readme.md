@@ -17,20 +17,19 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 2. You can remove or update some of the endpoints and models if you like.
 3. Open `sparkrosedigital_template_release_pipeline.yml` and set the name of your ADO project on line 43 (just search for `SparkRoseDigital_Template_ADO_Project` and rename it).
 4. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
+5. Configure the pipeline variables for `sparkrosedigital_template_release_pipeline`. More on that in section [Pipeline configuration](#pipeline-configuration).
 5. Approve PR.
 6. `git checkout master; git pull`
+7. Let the pipeline do its thing.
 
 Now configure the pipelines on ADO:
 
 1. Add three new pipelines: `sparkrosedigital_template_pr_pipeline`, `sparkrosedigital_template_build_pipeline`, `sparkrosedigital_template_release_pipeline`.
 
-Setup your AppServices:
+Provision Azure resources - you have two choices here:
 
-1. To do
-
-Setup your Azure SQL:
-
-1. To do
+* Option A: Run `./deploy.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure `$subscription` variable is properly defined.
+* Option B: Let the pipeline provision stuff on the first run.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
@@ -111,7 +110,19 @@ All pipelines build and deploy all applications (`Api` and `WorkerServices`) in 
 
 When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix). Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
 
-### Configure the pipelines
+### Pipeline configuration
+
+#### Azure Service Connection
+
+In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name (`AzureConnection_SparkRoseDigital_Template`) - make sure the name is correct.
+
+If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
+
+#### Provisioning resources
+
+To be able to execute Azure deployments, pipeline must have several variables defined. Please check `variables.ps1` and copy the variable names over to ADO release pipeline as pipeline variables.
+
+#### Database migrations
 
 To be able to execute migrations, `sparkrosedigital_template_release_pipeline` pipeline must have several variables defined: `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`, `DB_USER` and `DB_PASSWORD`.
 
@@ -119,11 +130,9 @@ To be able to execute migrations, `sparkrosedigital_template_release_pipeline` p
 
 **All** pipelines work with `master` branch . If you are using `main`, remember to do a search and replace.
 
-### Azure Service Connection
+## Provisioning resources on Azure manually
 
-In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name (`AzureConnection_SparkRoseDigital_Template`) - make sure the name is correct.
-
-If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html).
+Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own. The `variables.ps1` file has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
 
 ## Project naming
 

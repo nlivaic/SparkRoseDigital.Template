@@ -6,6 +6,9 @@
 # Environment files for Docker
 .env
 
+# Local Azure provisioning files
+variables.ps1
+
 # User-specific files
 *.rsuser
 *.suo

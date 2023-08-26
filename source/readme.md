@@ -11,25 +11,21 @@
 7. Run `./migrate.ps1`
 8. Go to http://localhost:44395/index.html
 
-At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code:
+At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code, push it to GitHub and get it deployed to your provisioned Azure resources:
 
 1. Go to GitHub, create a new repository and execute commands locally.
+2. `git push -u origin master`
 2. You can remove or update some of the endpoints and models if you like.
-3. Open `sparkrosedigital_template_release_pipeline.yml` and set the name of your ADO project on line 43 (just search for `SparkRoseDigital_Template_ADO_Project` and rename it).
+3. Open `release_pipeline.yml` and set the name of your ADO project on line 43 (just search for `SparkRoseDigital_Template_ADO_Project` and rename it). No need to touch anything if you are ok with the name.
 4. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
-5. Configure the pipeline variables for `sparkrosedigital_template_release_pipeline`. More on that in section [Pipeline configuration](#pipeline-configuration).
-5. Approve PR.
+5. Configure the pipeline variables for `release_pipeline`. More on that in section [Pipeline configuration](#pipeline-configuration).
+5. Push your branch. Create and approve PR.
 6. `git checkout master; git pull`
-7. Let the pipeline do its thing.
-
-Now configure the pipelines on ADO:
-
-1. Add three new pipelines: `sparkrosedigital_template_pr_pipeline`, `sparkrosedigital_template_build_pipeline`, `sparkrosedigital_template_release_pipeline`.
-
-Provision Azure resources - you have two choices here:
-
-* Option A: Run `./deploy.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure `$subscription` variable is properly defined.
-* Option B: Let the pipeline provision stuff on the first run.
+7. Now configure the pipelines on ADO. Add three new pipelines (`pr_pipeline`, `build_pipeline`, `release_pipeline`) based off of YAML files with the same name.
+8. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
+9. Approve PR. Let `build_pipeline` and `release_pipeline` do their work.
+10. Provision Azure resources - `release_pipeline` will do the work here as well.
+    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
@@ -98,23 +94,23 @@ Feature branches strategy is supported out of the box. This strategy expects all
 
 ### Naming the ADO project
 
-`sparkrosedigital_template_release_pipeline.yml` - `project` on line 42 should be the name of your ADO project.
+`release_pipeline.yml` - `project` property on lines 43, 53, 63 should be the name of your ADO project.
 
 ### Azure YAML pipelines:
 
-* `sparkrosedigital_template_pr_pipeline`
-* `sparkrosedigital_template_build_pipeline`
-* `sparkrosedigital_template_release_pipeline`
+* `pr_pipeline`
+* `build_pipeline`
+* `release_pipeline`
 
 All pipelines build and deploy all applications (`Api` and `WorkerServices`) in the solution.
 
-When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix). Naming the pipelines same as the files is important because the `sparkrosedigital_template_release_pipeline` is triggered by a successful `sparkrosedigital_template_build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `sparkrosedigital_template_release_pipeline.yml` - update `source` on line 8 and `definition` on line 39 to match the **build** pipeline name in ADO (if needed).
+When creating ADO pipelines, name them just like the files are named (minus the `.yml` suffix). Naming the pipelines same as the files is important because the `release_pipeline` is triggered by a successful `build_pipeline` run. If you decide to name your ADO pipelines differently, make sure you change two things in `release_pipeline.yml` - update `source` on line 8 and `definition` on line 40, 50, 60 to match the **build** pipeline name in ADO (if needed).
 
 ### Pipeline configuration
 
 #### Azure Service Connection
 
-In `sparkrosedigital_template_release_pipeline.yml:59` there is an Azure subscription name (`AzureConnection_SparkRoseDigital_Template`) - make sure the name is correct.
+In `release_pipeline.yml:59` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection_SparkRoseDigital_Template`) - make sure the name is the same as what is in Azure.
 
 If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
 
@@ -122,9 +118,19 @@ If you are logged into ADO and Azure with different usernames, then you will nee
 
 To be able to execute Azure deployments, pipeline must have several variables defined. Please check `variables.ps1` and copy the variable names over to ADO release pipeline as pipeline variables.
 
+#### Deployment
+
+`release_pipeline` deploys to resource group and resources based on pipeline variables.
+
 #### Database migrations
 
-To be able to execute migrations, `sparkrosedigital_template_release_pipeline` pipeline must have several variables defined: `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`, `DB_USER` and `DB_PASSWORD`.
+To be able to execute migrations, `release_pipeline` pipeline must have several variables defined: `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`, `DB_USER` and `DB_PASSWORD`.
+
+#### First run
+
+* `pr_pipeline` - on your first PR, the `pr_pipeline` will get triggered.
+* `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipelin`, except it uploads artifacts.
+* `release_pipeline` - once the `build_pipeline` is done, `release_pipeline` will get triggered, but it will stall. You need to manually give a few permissions, it should start running from there on.
 
 ### Branches
 

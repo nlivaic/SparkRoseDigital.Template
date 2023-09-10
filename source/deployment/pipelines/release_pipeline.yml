@@ -5,7 +5,7 @@ pr: none
 resources:
   pipelines:
   - pipeline: build_pipeline        # Used to reference the pipeline reference from other parts of the code.
-    source: sparkrosedigital_template_build_pipeline  	# This must match  the build pipeline name in ADO.
+    source: build_pipeline  	# This must match  the build pipeline name in ADO.
                                     # By default, pipelines are named after the ADO build pipeline name.
     trigger:
       branches:
@@ -37,7 +37,7 @@ jobs:
           displayName: 'Download Artifact SparkRoseDigital_Template.Api'
           inputs:
             buildType: 'specific'
-            definition: sparkrosedigital_template_build_pipeline
+            definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.Api'
             project: 'SparkRoseDigital_Template_ADO_Project'
@@ -47,7 +47,7 @@ jobs:
           displayName: 'Download Artifact SparkRoseDigital_Template.WorkerServices'
           inputs:
             buildType: 'specific'
-            definition: sparkrosedigital_template_build_pipeline
+            definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
             project: 'SparkRoseDigital_Template_ADO_Project'
@@ -57,13 +57,13 @@ jobs:
           displayName: 'Download Artifact SparkRoseDigital_Template.Migrations'
           inputs:
             buildType: 'specific'
-            definition: sparkrosedigital_template_build_pipeline
+            definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.Migrations'
             project: 'SparkRoseDigital_Template_ADO_Project'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations'
 
-        - script: dotnet $(Pipeline.Workspace)/drop/TestTemplate1.Migrations/TestTemplate1.Migrations.dll "$(ConnectionStrings__TestTemplate1Db_Migrations_Connection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/TestTemplate1.Migrations"
+        - script: dotnet $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations"
           displayName: 'Migrate database'
 
         - task: AzureWebApp@1
@@ -71,7 +71,7 @@ jobs:
           inputs:
             azureSubscription: 'AzureConnection_SparkRoseDigital_Template'
             appType: 'webAppLinux'
-            appName: 'wetest1web'
-            resourceGroupName: 'WE-TEST1-ASP1'
-            package: '$(Pipeline.Workspace)/drop/TestTemplate1.Api/**/*.zip'
+            appName: '$(app_service_web_name)'
+            resourceGroupName: '$(rg)'
+            package: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api/**/*.zip'
             runtimeStack: 'DOTNETCORE|6.0'

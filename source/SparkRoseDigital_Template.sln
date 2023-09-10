@@ -53,9 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deployment", "deployment", "{4D3D1A51-20AD-4511-9752-ABADC97AA84A}"
 	ProjectSection(SolutionItems) = preProject
-		deployment\app-service-plan.bicep = deployment\app-service-plan.bicep
+		deployment\iac.bicep = deployment\iac.bicep
 		deployment\resource-group.bicep = deployment\resource-group.bicep
-		deployment\sql-server.bicep = deployment\sql-server.bicep
 		deployment\variables.ps1 = deployment\variables.ps1
 	EndProjectSection
 EndProject

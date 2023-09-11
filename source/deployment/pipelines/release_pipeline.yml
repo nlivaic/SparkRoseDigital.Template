@@ -71,7 +71,7 @@ jobs:
           inputs:
             azureSubscription: 'AzureConnection_SparkRoseDigital_Template'
             appType: 'webAppLinux'
-            appName: '$(app_service_web_name)'
-            resourceGroupName: '$(rg)'
+            appName: '$(APP_SERVICE_WEB_NAME)'
+            resourceGroupName: '$(RG)'
             package: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api/**/*.zip'
             runtimeStack: 'DOTNETCORE|6.0'

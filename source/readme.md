@@ -25,7 +25,7 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 8. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
 9. Approve PR. Let `build_pipeline` and `release_pipeline` do their work.
 10. Provision Azure resources - `release_pipeline` will do the work here as well.
-    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
+    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
@@ -116,11 +116,23 @@ If you are logged into ADO and Azure with different usernames, then you will nee
 
 #### Provisioning resources
 
-To be able to execute Azure deployments, pipeline must have several variables defined. Please check `variables.ps1` and copy the variable names over to ADO release pipeline as pipeline variables.
+`release_pipeline` deploys to resource group and resources based on pipeline variables. To be able to execute Azure deployments, release pipeline must have several variables defined. Best way to make sure you have the correct value is to wait for the first successful deploy to Azure and copy/paste from the resource. Required pipeline variables
+* `APP_SERVICE_WEB_NAME` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
+* `ConnectionStrings__TestTemplate2Db_Migrations_Connection` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
+* `DB_PASSWORD` - administrator password of your choosing.
+* `DB_USER` - administrator username of your choosing.
+* `RG` - name of resource group.
+* `SUBSCRIPTION` - Azure subscription identifier
+* `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`.
+* `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to.
+* `PROJECT_NAME` - a moniker of your choosing to denote the project.
 
-#### Deployment
 
-`release_pipeline` deploys to resource group and resources based on pipeline variables.
+
+
+
+
+
 
 #### Database migrations
 
@@ -129,7 +141,7 @@ To be able to execute migrations, `release_pipeline` pipeline must have several 
 #### First run
 
 * `pr_pipeline` - on your first PR, the `pr_pipeline` will get triggered.
-* `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipelin`, except it uploads artifacts.
+* `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipeline`, except it uploads artifacts.
 * `release_pipeline` - once the `build_pipeline` is done, `release_pipeline` will get triggered, but it will stall. You need to manually give a few permissions, it should start running from there on.
 
 ### Branches
@@ -138,7 +150,7 @@ To be able to execute migrations, `release_pipeline` pipeline must have several 
 
 ## Provisioning resources on Azure manually
 
-Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own. The `variables.ps1` file has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
+Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own by executing `. ./provision.ps1`. Before running that script, look into `variables.ps1` file - it has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
 
 ## Project naming
 

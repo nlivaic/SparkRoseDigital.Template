@@ -27,7 +27,6 @@ using SparkRoseDigital.Infrastructure.Logging;
 using SparkRoseDigital_Template.Api.Helpers;
 using SparkRoseDigital_Template.Api.Middlewares;
 using SparkRoseDigital_Template.Application;
-using SparkRoseDigital_Template.Common.MessageBroker;
 using SparkRoseDigital_Template.Core;
 using SparkRoseDigital_Template.Data;
 
@@ -208,10 +207,7 @@ namespace SparkRoseDigital_Template.Api
                 {
                     x.UsingAzureServiceBus((ctx, cfg) =>
                     {
-                        cfg.Host(new MessageBrokerConnectionStringBuilder(
-                            _configuration.GetConnectionString("MessageBroker"),
-                            _configuration["MessageBroker:Writer:SharedAccessKeyName"],
-                            _configuration["MessageBroker:Writer:SharedAccessKey"]).ConnectionString);
+                        cfg.Host(_configuration.GetConnectionString("MessageBroker"));
 
                         // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
                         // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).

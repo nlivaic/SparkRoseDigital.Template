@@ -43,14 +43,6 @@ E.g. Docker Desktop:
 
     choco install docker-desktop
 
-## Configure Azure Service Bus
-
-Create a new namespace, with two Shared access policies, one for reading (called "ReadPolicy") and one for writing (called "WritePolicy"). Make sure both have `Manage` permission. Now find the primary connection string and copy it somewhere. You will only need the part up until the first semicolon (`Endpoint=sb://yourApplicationName.servicebus.windows.net/`). Also make a note of your policies names and keys. You will need all of these to configure the environment variables.
-
-## Configure Application Insights
-
-Create a new Application Insights. If you are building a distributed system then reuse an existing one. Just make sure to copy/paste the connection string instead of instrumentation key.
-
 ## Configuration
 
 ### Set configuration
@@ -82,8 +74,6 @@ At this point you have several things up and running:
 - Empty Sql Server database (dockerized)
 - Azure Service bus with several topics, subscriptions and queues
 - nginx reverse proxy in `docker-compose.yml`
-- Smtp fake email server in `docker-compose.yml`
-- Seq log management service in `docker-compose.yml`
 
 Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the SSMS and register your database server there. It is accessible on localhost, port 1433, with the username and password you set in your `.env` file under `DB_USER` and `DB_PASSWORD`.
 

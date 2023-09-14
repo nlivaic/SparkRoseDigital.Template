@@ -15,12 +15,24 @@ jobs:
 - deployment: sparkrosedigital_template_deploy_to_appservice
   displayName: SparkRoseDigital_Template Deploy to AppService
   environment: production
+  variables:
+    adoProject: 'SparkRoseDigital_Template_ADO_Project'
+    azureServiceConnection: 'AzureConnection_SparkRoseDigital_Template'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
     runOnce:
       deploy:
         steps:
+        - checkout: self
+          fetchDepth: 0
+
+        - script: pwd
+          displayName: 'Basic Information - pwd'
+
+        - script: ls -al
+          displayName: 'Basic Information - Directory Contents'
+
         - task: PowerShell@2
           displayName: 'Create version number'
           name: 'CreateVersionNumber'
@@ -40,7 +52,7 @@ jobs:
             definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.Api'
-            project: 'SparkRoseDigital_Template_ADO_Project'
+            project: '$(adoProject)'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api'
 
         - task: DownloadPipelineArtifact@2
@@ -50,7 +62,7 @@ jobs:
             definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
-            project: 'SparkRoseDigital_Template_ADO_Project'
+            project: '$(adoProject)'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.WorkerServices'
 
         - task: DownloadPipelineArtifact@2
@@ -60,18 +72,36 @@ jobs:
             definition: build_pipeline
             buildVersionToDownload: 'latest'
             artifactName: 'drop.SparkRoseDigital_Template.Migrations'
-            project: 'SparkRoseDigital_Template_ADO_Project'
+            project: '$(adoProject)'
             downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations'
 
-        - script: dotnet $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations"
+        - task: AzureCLI@2
+          displayName: 'Deploy Bicep'
+          name: 'bicepOutput'
+          inputs:
+            azureSubscription: 'AzureConnection_TestTemplate2'
+            scriptType: pscore
+            scriptLocation: inlineScript
+            useGlobalConfig: false
+            inlineScript: |
+              $jsonResultRg = az deployment sub create --location $(LOCATION) --template-file ./deployment/resource-group.bicep --parameters environment=$(ENVIRONMENT) projectName=$(PROJECT_NAME) location=$(LOCATION) | ConvertFrom-Json
+              $resourceGroupName = $jsonResultRg.properties.outputs.resourceGroupName.value
+              Write-Host "##vso[task.setvariable variable=resourceGroupName;isoutput=true]$resourceGroupName"
+              $jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$(ENVIRONMENT) projectName=$(PROJECT_NAME) db_user=$(DB_USER) db_password=$(DB_PASSWORD) | ConvertFrom-Json
+              $appServiceWebName = $jsonResultAll.properties.outputs.appServiceWebName.value
+              Write-Host "##vso[task.setvariable variable=appServiceWebName;isoutput=true]$appServiceWebName"
+              $dbConnection = $jsonResultAll.properties.outputs.dbConnection.value
+              Write-Host "##vso[task.setvariable variable=dbConnection;isoutput=true]$dbConnection"
+
+        - script: dotnet $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(bicepOutput.dbConnection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations"
           displayName: 'Migrate database'
 
         - task: AzureWebApp@1
           displayName: 'Deploy SparkRoseDigital_Template.Api to App Service'
           inputs:
-            azureSubscription: 'AzureConnection_SparkRoseDigital_Template'
+            azureSubscription: 'AzureConnection_TestTemplate2'
             appType: 'webAppLinux'
-            appName: '$(APP_SERVICE_WEB_NAME)'
-            resourceGroupName: '$(RG)'
+            appName: '$(bicepOutput.appServiceWebName)'
+            resourceGroupName: '$(bicepOutput.resourceGroupName)'
             package: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api/**/*.zip'
             runtimeStack: 'DOTNETCORE|6.0'

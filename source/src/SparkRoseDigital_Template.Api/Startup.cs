@@ -200,17 +200,24 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddMassTransit(x =>
             {
-                x.UsingAzureServiceBus((ctx, cfg) =>
+                if (string.IsNullOrEmpty(_configuration.GetConnectionString("MessageBroker")))
                 {
-                    cfg.Host(new MessageBrokerConnectionStringBuilder(
-                        _configuration.GetConnectionString("MessageBroker"),
-                        _configuration["MessageBroker:Writer:SharedAccessKeyName"],
-                        _configuration["MessageBroker:Writer:SharedAccessKey"]).ConnectionString);
+                    x.UsingInMemory();
+                }
+                else
+                {
+                    x.UsingAzureServiceBus((ctx, cfg) =>
+                    {
+                        cfg.Host(new MessageBrokerConnectionStringBuilder(
+                            _configuration.GetConnectionString("MessageBroker"),
+                            _configuration["MessageBroker:Writer:SharedAccessKeyName"],
+                            _configuration["MessageBroker:Writer:SharedAccessKey"]).ConnectionString);
 
-                    // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
-                    // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
-                    // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
-                });
+                        // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
+                        // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
+                        // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
+                    });
+                }
                 x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
                 {
                     // configure which database lock provider to use (Postgres, SqlServer, or MySql)

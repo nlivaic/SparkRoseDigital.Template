@@ -84,41 +84,49 @@ namespace SparkRoseDigital_Template.WorkerServices
                         x.AddConsumer<FooFaultConsumer>();
                         x.AddConsumer<FaultConsumer>();
                         x.AddConsumer<FooCommandConsumer>(typeof(FooCommandConsumer.FooCommandConsumerDefinition));
-                        x.UsingAzureServiceBus((ctx, cfg) =>
+
+                        if (string.IsNullOrEmpty(configuration.GetConnectionString("MessageBroker")))
                         {
-                            cfg.Host(
+                            x.UsingInMemory();
+                        }
+                        else
+                        {
+                            x.UsingAzureServiceBus((ctx, cfg) =>
+                            {
+                                cfg.Host(
                                 new MessageBrokerConnectionStringBuilder(
                                     configuration.GetConnectionString("MessageBroker"),
                                     configuration["MessageBroker:Reader:SharedAccessKeyName"],
                                     configuration["MessageBroker:Reader:SharedAccessKey"]).ConnectionString);
 
-                            // Use the below line if you are not going with
-                            // SetKebabCaseEndpointNameFormatter() in the publishing project (see API project),
-                            // but have rather given the topic a custom name.
-                            // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("foo-topic"));
-                            cfg.SubscriptionEndpoint<IFooEvent>("foo-event-subscription-1", e =>
-                            {
-                                e.ConfigureConsumer<FooConsumer>(ctx);
-                            });
+                                // Use the below line if you are not going with
+                                // SetKebabCaseEndpointNameFormatter() in the publishing project (see API project),
+                                // but have rather given the topic a custom name.
+                                // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("foo-topic"));
+                                cfg.SubscriptionEndpoint<IFooEvent>("foo-event-subscription-1", e =>
+                                {
+                                    e.ConfigureConsumer<FooConsumer>(ctx);
+                                });
 
-                            // This is here only for show. I have not thought through a proper
-                            // error handling strategy.
-                            cfg.SubscriptionEndpoint<Fault<IFooEvent>>("foo-event-fault-consumer", e =>
-                            {
-                                e.ConfigureConsumer<FooFaultConsumer>(ctx);
-                            });
+                                // This is here only for show. I have not thought through a proper
+                                // error handling strategy.
+                                cfg.SubscriptionEndpoint<Fault<IFooEvent>>("foo-event-fault-consumer", e =>
+                                {
+                                    e.ConfigureConsumer<FooFaultConsumer>(ctx);
+                                });
 
-                            // This is here only for show. I have not thought through a proper
-                            // error handling strategy.
-                            cfg.SubscriptionEndpoint<Fault>("fault-consumer", e =>
-                            {
-                                e.ConfigureConsumer<FaultConsumer>(ctx);
-                            });
-                            cfg.ConfigureEndpoints(ctx);
+                                // This is here only for show. I have not thought through a proper
+                                // error handling strategy.
+                                cfg.SubscriptionEndpoint<Fault>("fault-consumer", e =>
+                                {
+                                    e.ConfigureConsumer<FaultConsumer>(ctx);
+                                });
+                                cfg.ConfigureEndpoints(ctx);
 
-                            cfg.UseMessageBrokerTracing();
-                            cfg.UseExceptionLogger(services);
-                        });
+                                cfg.UseMessageBrokerTracing();
+                                cfg.UseExceptionLogger(services);
+                            });
+                        }
                         x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
                         {
                             // configure which database lock provider to use (Postgres, SqlServer, or MySql)

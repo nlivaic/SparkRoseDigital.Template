@@ -21,3 +21,5 @@ resource resourceGroup_resource 'Microsoft.Resources/resourceGroups@2021-04-01' 
   name: resourceGroup_name
   location: location
 }
+
+output resourceGroupName string = resourceGroup_name

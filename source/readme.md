@@ -122,18 +122,15 @@ If you are logged into ADO and Azure with different usernames, then you will nee
 
 #### Release pipeline Database Migrations and Provisioning resources
 
-`release_pipeline` deploys to resource group and resources based on pipeline variables. To be able to execute Azure deployments, release pipeline must have several variables defined. Best way to make sure you have the correct value is to wait for the first successful deploy to Azure and copy/paste from the resource. Required pipeline variables
-* `APP_SERVICE_WEB_NAME` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
-* `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
+`release_pipeline` deploys to resource group and resources based on pipeline variables:
 * `DB_PASSWORD` - administrator password of your choosing.
 * `DB_USER` - administrator username of your choosing.
-* `RG` - name of resource group. You will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
 * `SUBSCRIPTION` - Azure subscription identifier
 * `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`.
 * `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to.
 * `PROJECT_NAME` - a moniker of your choosing to denote the project.
 
-#### First run
+#### First deployment run
 
 * `pr_pipeline` - on your first PR, the `pr_pipeline` will get triggered.
 * `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipeline`, except it uploads artifacts.

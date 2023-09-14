@@ -36,10 +36,6 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
             {
                 Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
             }
-            Environment.SetEnvironmentVariable("MessageBroker__Writer__SharedAccessKeyName", "Test");
-            Environment.SetEnvironmentVariable("MessageBroker__Writer__SharedAccessKey", "Test");
-            Environment.SetEnvironmentVariable("MessageBroker__Reader__SharedAccessKeyName", "Test");
-            Environment.SetEnvironmentVariable("MessageBroker__Reader__SharedAccessKey", "Test");
             return base.CreateHostBuilder()
                 .ConfigureHostConfiguration(
                     config => config.AddEnvironmentVariables("ASPNETCORE"));

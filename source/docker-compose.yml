@@ -98,12 +98,5 @@ services:
       dockerfile: src/SparkRoseDigital_Template.WorkerServices/Dockerfile
     networks:
       - sparkrosedigital_templatenet
-  sparkrosedigital_template.smtp:
-    ports:
-      - "5010:80"
-    image: rnwood/smtp4dev
-    restart: always
-    networks:
-      - sparkrosedigital_templatenet
 networks:
   sparkrosedigital_templatenet: {}

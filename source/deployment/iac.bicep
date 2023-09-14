@@ -32,15 +32,13 @@ var log_analytics_name = toLower('${baseName}${law}1')
 var app_insight_name = toLower('${baseName}${ai}1')
 var service_bus_name = toLower('${baseName}${sb}1')
 var service_bus_RootManageSharedAccessKey_name = 'RootManageSharedAccessKey'
-var service_bus_WritePolicy_name = 'WritePolicy'
+var service_bus_ReadWritePolicy_name = 'ReadWritePolicy'
 
 var db_connection_string_env_var_name = 'SparkRoseDigital_TemplateDbConnection'
 var db_user_env_var_name = 'DB_USER'
 var db_password_env_var_name = 'DB_PASSWORD'
 var applicationinsights_connection_string_env_var_name = 'APPLICATIONINSIGHTS_CONNECTION_STRING'
 var messageBroker_connectionStrings_env_var_name = 'MessageBroker'
-var messagebroker_writer_sharedaccesskeyname_env_var_name = 'MessageBroker__Writer__SharedAccessKeyName'
-var messagebroker_writer_sharedaccesskey_env_var_name = 'MessageBroker__Writer__SharedAccessKey'
 
 resource sqlserver 'Microsoft.Sql/servers@2022-11-01-preview' = {
   name: sqlserver_name
@@ -108,7 +106,7 @@ resource app_service_web 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: messageBroker_connectionStrings_env_var_name
           connectionString: listKeys(
-            '${service_bus.id}/AuthorizationRules/${service_bus_WritePolicy_name}',
+            '${service_bus.id}/AuthorizationRules/${service_bus_ReadWritePolicy_name}',
             service_bus.apiVersion).primaryConnectionString
           type: 'Custom'
         }
@@ -134,17 +132,6 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
       {
           name: applicationinsights_connection_string_env_var_name
           value: app_insights.properties.ConnectionString
-      }
-      {
-          name: messagebroker_writer_sharedaccesskeyname_env_var_name
-          value: service_bus_WritePolicy_name
-      }
-      {
-          name: messagebroker_writer_sharedaccesskey_env_var_name
-          value: listKeys(
-            '${service_bus.id}/AuthorizationRules/${service_bus_WritePolicy_name}',
-            service_bus.apiVersion).primaryKey
-
       }
     ]
     numberOfWorkers: 1
@@ -215,8 +202,8 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
     }
   }
 
-  resource service_bus_WritePolicy 'authorizationrules@2022-10-01-preview' = {
-    name: service_bus_WritePolicy_name
+  resource service_bus_ReadWritePolicy 'authorizationrules@2022-10-01-preview' = {
+    name: service_bus_ReadWritePolicy_name
     properties: {
       rights: [
         'Manage'

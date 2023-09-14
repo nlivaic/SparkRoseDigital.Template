@@ -13,7 +13,6 @@ using OpenTelemetry.Trace;
 using Serilog;
 using SparkRoseDigital.Infrastructure.Caching;
 using SparkRoseDigital.Infrastructure.Logging;
-using SparkRoseDigital_Template.Common.MessageBroker;
 using SparkRoseDigital_Template.Common.MessageBroker.Middlewares.ErrorLogging;
 using SparkRoseDigital_Template.Common.MessageBroker.Middlewares.Tracing;
 using SparkRoseDigital_Template.Core;
@@ -93,11 +92,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                         {
                             x.UsingAzureServiceBus((ctx, cfg) =>
                             {
-                                cfg.Host(
-                                new MessageBrokerConnectionStringBuilder(
-                                    configuration.GetConnectionString("MessageBroker"),
-                                    configuration["MessageBroker:Reader:SharedAccessKeyName"],
-                                    configuration["MessageBroker:Reader:SharedAccessKey"]).ConnectionString);
+                                cfg.Host(configuration.GetConnectionString("MessageBroker"));
 
                                 // Use the below line if you are not going with
                                 // SetKebabCaseEndpointNameFormatter() in the publishing project (see API project),

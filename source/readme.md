@@ -3,28 +3,34 @@
 > All the steps outlined here are detailed further on down in the document.
 
 1. Run docker-desktop
-2. Configure Azure Service Bus
-3. Configure Application Insights.
-4. Run `./configure.ps1`
-5. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
-6. Run `./create_migration.ps1 '' 'Initial migration'`
-7. Run `./migrate.ps1`
-8. Go to http://localhost:44395/index.html
+2. Run `./configure.ps1`
+3. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
+4. Run `./create_migration.ps1 '' 'Initial migration'`
+5. Run `./migrate.ps1`
+6. Run the solution again.
+6. Go to http://localhost:44395/index.html
 
 At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code, push it to GitHub and get it deployed to your provisioned Azure resources:
 
 1. Go to GitHub, create a new repository and execute commands locally.
 2. `git push -u origin master`
-2. You can remove or update some of the endpoints and models if you like.
-3. Open `release_pipeline.yml` and set the name of your ADO project on line 43 (just search for `SparkRoseDigital_Template_ADO_Project` and rename it). No need to touch anything if you are ok with the name.
-4. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
-5. Configure the pipeline variables for `release_pipeline`. More on that in section [Pipeline configuration](#pipeline-configuration).
-5. Push your branch. Create and approve PR.
-6. `git checkout master; git pull`
-7. Now configure the pipelines on ADO. Add three new pipelines (`pr_pipeline`, `build_pipeline`, `release_pipeline`) based off of YAML files with the same name.
-8. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
-9. Approve PR. Let `build_pipeline` and `release_pipeline` do their work.
-10. Provision Azure resources - `release_pipeline` will do the work here as well.
+3. You can remove or update some of the endpoints and models if you like.
+4. Open `release_pipeline.yml` and set the value for `adoProject` variable. No need to touch anything if you are ok with the name and ADO project has the same name.
+5. Set up [Azure Service Connection](#azure-service-connection). Copy the name from ADO to `release_pipeline.yml` lines 73 and 87.
+6. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
+7. Create and approve PR.
+8. `git checkout master; git pull`
+9. Now configure the pipelines on ADO. Add three new pipelines (`pr_pipeline`, `build_pipeline`, `release_pipeline`) based off of YAML files with the same name.
+10. Configure the pipeline variables for `release_pipeline`. More on that in section [Release pipeline Database Migrations and Provisioning resources](#release-pipeline-database-migrations-and-provisioning-resources). One detail here: you probably won't know all the details on the first ever run, so it might be easiest to provision manually this one time:
+    1. Make sure you do `az login` first and log in to the correct subscription.
+    2. Populate `variables.ps1`
+    3. Execute `. ./provision.ps1` to provision Azure 
+    resources
+    4. Then copy stuff over to the pipeline variables.
+
+11. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
+12. Approve PR. Let `build_pipeline` and `release_pipeline` do their work.
+13. Provision Azure resources - `release_pipeline` will do the work here as well.
     * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
@@ -110,35 +116,21 @@ When creating ADO pipelines, name them just like the files are named (minus the 
 
 #### Azure Service Connection
 
-In `release_pipeline.yml:59` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection_SparkRoseDigital_Template`) - make sure the name is the same as what is in Azure.
+In `release_pipeline.yml:72` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection_SparkRoseDigital_Template`) - make sure the name is the same as what is in Azure.
 
 If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
 
-#### Provisioning resources
+#### Release pipeline Database Migrations and Provisioning resources
 
-`release_pipeline` deploys to resource group and resources based on pipeline variables. To be able to execute Azure deployments, release pipeline must have several variables defined. Best way to make sure you have the correct value is to wait for the first successful deploy to Azure and copy/paste from the resource. Required pipeline variables
-* `APP_SERVICE_WEB_NAME` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
-* `ConnectionStrings__TestTemplate2Db_Migrations_Connection` - you will have to know this up front. If you put in a wrong value, the deployment will fail, but resources will still be provisioned so you can go to Azure to copy/paste the value.
+`release_pipeline` deploys to resource group and resources based on pipeline variables:
 * `DB_PASSWORD` - administrator password of your choosing.
 * `DB_USER` - administrator username of your choosing.
-* `RG` - name of resource group.
 * `SUBSCRIPTION` - Azure subscription identifier
 * `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`.
 * `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to.
 * `PROJECT_NAME` - a moniker of your choosing to denote the project.
 
-
-
-
-
-
-
-
-#### Database migrations
-
-To be able to execute migrations, `release_pipeline` pipeline must have several variables defined: `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`, `DB_USER` and `DB_PASSWORD`.
-
-#### First run
+#### First deployment run
 
 * `pr_pipeline` - on your first PR, the `pr_pipeline` will get triggered.
 * `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipeline`, except it uploads artifacts.

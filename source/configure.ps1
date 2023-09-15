@@ -20,22 +20,11 @@ $msg_broker_connection_string = Read-Host -Prompt 'Message broker connection str
 # Azure Application Insights Connection String
 $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights connection string (Azure)'
 
-
-if (![string]::IsNullOrWhiteSpace($db_admin_pw)) {
-    (Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($db_user)) {
-    (Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($db_pw)) {
-    (Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($msg_broker_connection_string)) {
-    (Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($applicationinsights_connection_string)) {
-    (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
-}
+(Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
+(Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
+(Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
+(Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
+(Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
 
 # git init only on a new repo
 git rev-parse --is-inside-work-tree 2> out-null

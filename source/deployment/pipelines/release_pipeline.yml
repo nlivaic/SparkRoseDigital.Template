@@ -79,7 +79,7 @@ jobs:
           displayName: 'Deploy Bicep'
           name: 'bicepOutput'
           inputs:
-            azureSubscription: 'AzureConnection_TestTemplate2'
+            azureSubscription: 'AzureConnection'
             scriptType: pscore
             scriptLocation: inlineScript
             useGlobalConfig: false
@@ -99,7 +99,7 @@ jobs:
         - task: AzureWebApp@1
           displayName: 'Deploy SparkRoseDigital_Template.Api to App Service'
           inputs:
-            azureSubscription: 'AzureConnection_TestTemplate2'
+            azureSubscription: 'AzureConnection'
             appType: 'webAppLinux'
             appName: '$(bicepOutput.appServiceWebName)'
             resourceGroupName: '$(bicepOutput.resourceGroupName)'

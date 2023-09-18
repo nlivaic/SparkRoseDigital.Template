@@ -8,7 +8,7 @@
 4. Run `./create_migration.ps1 '' 'Initial migration'`
 5. Run `./migrate.ps1`
 6. Run the solution again.
-6. Go to http://localhost:44395/index.html
+6. Go to https://localhost:5000/index.html
 
 At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code, push it to GitHub and get it deployed to your provisioned Azure resources:
 
@@ -60,15 +60,13 @@ Application is accessing the database as a `DB_USER`/`DB_PASSWORD`, with a gener
 
 # Running The Application
 
-Make sure to set the `docker-compose` as the startup project. The application can be reached by default on `localhost:44395`. You can change this in the `docker-compose.yml`. Just go to `/swagger/index.html` to see the initial API.
+Make sure to set the `docker-compose` as the startup project. The application can be reached by default on `localhost:5000`. You can change this in the `docker-compose.yml`. Just go to `/index.html` to see the initial API.
 
 At this point you have several things up and running:
 
 - API (dockerized)
 - Worker service (dockerized)
-- Empty Sql Server database (dockerized)
-- Azure Service bus with several topics, subscriptions and queues
-- nginx reverse proxy in `docker-compose.yml`
+- Empty Sql Server database with a volume (dockerized)
 
 Now it is time to create some tables in the database. From the root of your solution, first run `.\create_migration.ps1 '' '0001_Initial'` and then `./migrate.ps1`. Now you have to go to the SSMS and register your database server there. It is accessible on localhost, port 1433, with the username and password you set in your `.env` file under `DB_USER` and `DB_PASSWORD`.
 
@@ -136,28 +134,6 @@ All projects have a prefix `SparkRoseDigital_Template` and pipelines latch onto 
 ## Versioning
 
 We are using semver and GitVersion. Each commit message gets a suffix (defined in `./githooks/prepare-commit-msg` and recognized in `GitVersion.yml`). `feature/` branch gets a suffix saying GitVersion should bump minor version. `fix/` branch gets a suffix saying GitVersion should bump patch version. Bumping major version needs to be done manually by tagging a commit. We do not embed the version in the assemblies yet. GitVersion depends on `--no-ff` merges to be able to deduce version successfully. Make sure your ADO project enforces this, do not allow developers to merge PRs differently! 
-
-## Generating cert for your local development box
-
-The template does not use HTTPS, however it can easily be added. There is a `.conf` file in there which you need to tweak to your liking. Then you need to generate `.crt` and `.key` files for Api. These make up the self-signed certificate, and the commands to create the certificate are below, with a dummy password of `rootpw`:
-
-1. Go to **solution root folder** and execute below lines from **WSL2**:
-
-   sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout api-local.sparkrosedigital_template.key -out api-local.sparkrosedigital_template.crt -config api-local.sparkrosedigital_template.conf -passin pass:rootpw
-
-   sudo openssl pkcs12 -export -out api-local.sparkrosedigital_template.pfx -inkey api-local.sparkrosedigital_template.key -in api-local.sparkrosedigital_template.crt
-
-2. Add the certificate to your computers CA store: go to ./nginx, right-click on `.pfx` files and install to `LocalMachine` -> `Trusted Root Certification Authorities`.
-
-For more details consult: https://bit.ly/3eWOHH2
-
-## Hosts file
-
-You can tell nginx to work with the `localhost`, however this might become a problem if you have multiple services running. To sidestep the issue you can keep the nginx.conf as it is, but that will require a change to `hosts` file.
-
-    # Development DNS
-    127.0.0.1	    api-local.sparkrosedigital_template.com
-    127.0.0.1	    id-local.sparkrosedigital_template.com
 
 ## Migrations
 

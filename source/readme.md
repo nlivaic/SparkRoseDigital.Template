@@ -12,25 +12,20 @@
 
 At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code, push it to GitHub and get it deployed to your provisioned Azure resources:
 
-1. Go to GitHub, create a new repository and execute commands locally.
+1. Go to GitHub, create a new repository and add remote origin.
 2. `git push -u origin master`
 3. You can remove or update some of the endpoints and models if you like.
-4. Open `release_pipeline.yml` and set the value for `adoProject` variable. No need to touch anything if you are ok with the name and ADO project has the same name.
-5. Set up [Azure Service Connection](#azure-service-connection). Copy the name from ADO to `release_pipeline.yml` lines 73 and 87.
-6. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
-7. Create and approve PR.
-8. `git checkout master; git pull`
-9. Now configure the pipelines on ADO. Add three new pipelines (`pr_pipeline`, `build_pipeline`, `release_pipeline`) based off of YAML files with the same name.
-10. Configure the pipeline variables for `release_pipeline`. More on that in section [Release pipeline Database Migrations and Provisioning resources](#release-pipeline-database-migrations-and-provisioning-resources). One detail here: you probably won't know all the details on the first ever run, so it might be easiest to provision manually this one time:
-    1. Make sure you do `az login` first and log in to the correct subscription.
-    2. Populate `variables.ps1`
-    3. Execute `. ./provision.ps1` to provision Azure 
-    resources
-    4. Then copy stuff over to the pipeline variables.
-
-11. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
-12. Approve PR. Let `build_pipeline` and `release_pipeline` do their work.
-13. Provision Azure resources - `release_pipeline` will do the work here as well.
+4. Go to Azure DevOps and create a new project.
+5. Open `release_pipeline.yml` and set the value for `adoProject` variable. No need to touch anything if you are ok with the name and ADO project has the same name.
+6. Set up [Azure Service Connection](#azure-service-connection). Copy the name from ADO to `release_pipeline.yml` to several properties named `azureSubscription` (or just name it `AzureConnection` in ADO).
+7. `git checkout -b feature/initial-code-commit; git add *; git commit -m "Initial code commit."; git push -u origin feature/initial-code-commit`
+8. Create and approve PR.
+9. `git checkout master; git pull`
+10. Now configure the pipelines on ADO. Add three new pipelines (`pr_pipeline`, `build_pipeline`, `release_pipeline`) based off of YAML files with the same name.
+11. Configure the pipeline variables for `release_pipeline`. More on that in section [Release pipeline Database Migrations and Provisioning resources](#release-pipeline-database-migrations-and-provisioning-resources).
+12. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
+13. Approve PR. Let `build_pipeline` and `release_pipeline` do their work. You will probably need to open `release_pipeline` on the first run and approve some stuff.
+14. Provision Azure resources - `release_pipeline` will do the work here as well.
     * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!

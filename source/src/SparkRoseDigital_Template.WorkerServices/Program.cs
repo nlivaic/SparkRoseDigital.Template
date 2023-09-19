@@ -156,7 +156,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                               //        .SetResourceBuilder(
                               //            ResourceBuilder
                               //                .CreateDefault()
-                              //                .AddService(serviceName: "TestTemplate2"))
+                              //                .AddService(serviceName: "SparkRoseDigital_Template"))
                               //        .AddAspNetCoreInstrumentation()
                               //        .AddAzureMonitorMetricExporter(o =>
                               //        {

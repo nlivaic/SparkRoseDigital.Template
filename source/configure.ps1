@@ -6,6 +6,36 @@ Write-Output "Some inputs do not have default values, you will probably have to 
 Write-Output "You can rerun the script but no new values will be applied to the .env file."
 Write-Output "If you want to edit a previously provided value, it is best to edit .env file manually."
 
+# If none, create a ".env" file
+if (!(Test-Path ".env"))
+{
+   New-Item -name ".env" -type "file" -value @"
+APPLICATIONINSIGHTS_CONNECTION_STRING=<applicationinsights_connection_string>
+ConnectionStrings__SparkRoseDigital_TemplateDbConnection=Data Source=sparkrosedigital_template.sql;Initial Catalog=SparkRoseDigital_TemplateDb
+ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection=Data Source=host.docker.internal,1433;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
+ConnectionStrings__MessageBroker=<msg_broker_connection_string>
+DB_USER=<db_user>
+DB_PASSWORD=<db_pw>
+DB_ADMIN_PASSWORD=<db_admin_pw>
+"@
+    Write-Host "Created new file and text content added"
+}
+
+# If none, create a ".variables.ps1" file
+if (!(Test-Path "deployment/variables.ps1"))
+{
+   New-Item -name "deployment/variables.ps1" -type "file" -value @"
+# Used only for LOCAL deployment!
+$SUBSCRIPTION=""
+$LOCATION=""
+$ENVIRONMENT=""
+$PROJECT_NAME=""
+$DB_USER=""
+$DB_PASSWORD=""
+"@
+    Write-Host "Created new file and text content added"
+}
+
 # Database administrator password
 $db_admin_pw_default = "Pa55w0rd_1337"
 if (!($db_admin_pw = Read-Host "Database admin password [$db_admin_pw_default]")) { $db_admin_pw = $db_admin_pw_default }
@@ -20,25 +50,14 @@ $msg_broker_connection_string = Read-Host -Prompt 'Message broker connection str
 # Azure Application Insights Connection String
 $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights connection string (Azure)'
 
-
-if (![string]::IsNullOrWhiteSpace($db_admin_pw)) {
-    (Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($db_user)) {
-    (Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($db_pw)) {
-    (Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($msg_broker_connection_string)) {
-    (Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
-}
-if (![string]::IsNullOrWhiteSpace($applicationinsights_connection_string)) {
-    (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
-}
+(Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
+(Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
+(Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
+(Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
+(Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
 
 # git init only on a new repo
-git rev-parse --is-inside-work-tree 2> out-null
+git rev-parse --is-inside-work-tree | Out-Null
 if ( $LASTEXITCODE -ne 0)
 {
     git init

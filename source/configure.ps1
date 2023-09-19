@@ -27,7 +27,7 @@ $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights
 (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
 
 # git init only on a new repo
-git rev-parse --is-inside-work-tree 2> out-null
+git rev-parse --is-inside-work-tree | Out-Null
 if ( $LASTEXITCODE -ne 0)
 {
     git init

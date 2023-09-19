@@ -6,6 +6,36 @@ Write-Output "Some inputs do not have default values, you will probably have to 
 Write-Output "You can rerun the script but no new values will be applied to the .env file."
 Write-Output "If you want to edit a previously provided value, it is best to edit .env file manually."
 
+# If none, create a ".env" file
+if (!(Test-Path ".env"))
+{
+   New-Item -name ".env" -type "file" -value @"
+APPLICATIONINSIGHTS_CONNECTION_STRING=<applicationinsights_connection_string>
+ConnectionStrings__SparkRoseDigital_TemplateDbConnection=Data Source=sparkrosedigital_template.sql;Initial Catalog=SparkRoseDigital_TemplateDb
+ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection=Data Source=host.docker.internal,1433;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
+ConnectionStrings__MessageBroker=<msg_broker_connection_string>
+DB_USER=<db_user>
+DB_PASSWORD=<db_pw>
+DB_ADMIN_PASSWORD=<db_admin_pw>
+"@
+    Write-Host "Created new file and text content added"
+}
+
+# If none, create a ".variables.ps1" file
+if (!(Test-Path "deployment/variables.ps1"))
+{
+   New-Item -name "deployment/variables.ps1" -type "file" -value @"
+# Used only for LOCAL deployment!
+$SUBSCRIPTION=""
+$LOCATION=""
+$ENVIRONMENT=""
+$PROJECT_NAME=""
+$DB_USER=""
+$DB_PASSWORD=""
+"@
+    Write-Host "Created new file and text content added"
+}
+
 # Database administrator password
 $db_admin_pw_default = "Pa55w0rd_1337"
 if (!($db_admin_pw = Read-Host "Database admin password [$db_admin_pw_default]")) { $db_admin_pw = $db_admin_pw_default }

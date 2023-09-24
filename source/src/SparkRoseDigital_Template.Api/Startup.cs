@@ -222,14 +222,6 @@ namespace SparkRoseDigital_Template.Api
                     .WithMethods(HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete);
             }));
 
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddIdentityServerAuthentication("Bearer", options =>
-            //    {
-            //        options.Authority = _configuration["IdentityProvider:Authority"];       // Our IDP. Middleware uses this to know where to find public keys and endpoints.
-            //        options.ApiName = _configuration["IdentityProvider:ApiName"];           // Allows the access token validator to check if the access token `audience` is for this API.
-            //    });
-            //services.AddAuthorization();
-
             services.AddMassTransit(x =>
             {
                 if (string.IsNullOrEmpty(_configuration.GetConnectionString("MessageBroker")))

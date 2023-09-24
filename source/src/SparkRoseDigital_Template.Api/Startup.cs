@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.Exporter;
@@ -91,6 +92,15 @@ namespace SparkRoseDigital_Template.Api
             services.AddSpecificRepositories();
             services.AddCoreServices();
 
+            services
+                .AddAuthentication("Bearer")
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = _configuration["AUTH:AUTHORITY"];
+                    options.Audience = _configuration["AUTH:AUDIENCE"];
+                    options.TokenValidationParameters.ValidIssuer = _configuration["AUTH:VALID_ISSUER"];
+                });
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLoggingScopes();
@@ -141,6 +151,29 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddSwaggerGen(setupAction =>
             {
+                setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Description = "Bearer Authentication with JWT Token",
+                    Type = SecuritySchemeType.Http
+                });
+                setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
                 setupAction.SwaggerDoc(
                     "SparkRoseDigital_TemplateOpenAPISpecification",
                     new OpenApiInfo

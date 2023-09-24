@@ -17,6 +17,9 @@ ConnectionStrings__MessageBroker=<msg_broker_connection_string>
 DB_USER=<db_user>
 DB_PASSWORD=<db_pw>
 DB_ADMIN_PASSWORD=<db_admin_pw>
+AUTH__AUTHORITY=<auth_authority>
+AUTH__AUDIENCE=<auth_audience>
+AUTH__VALID_ISSUER=<auth_valid_issuer>
 "@
     Write-Host "Created new file and text content added"
 }
@@ -49,12 +52,21 @@ if (!($db_pw = Read-Host "Database user password [$db_pw_default]")) { $db_pw = 
 $msg_broker_connection_string = Read-Host -Prompt 'Message broker connection string (Azure Service Bus)'
 # Azure Application Insights Connection String
 $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights connection string (Azure)'
+# Azure AD Authority URL
+$auth_authority = Read-Host -Prompt 'Azure AD Authority URL'
+# Claim identifying this API
+$auth_audience = Read-Host -Prompt 'This APIs audience identifier'
+# Valid issuer (since AAD authority URL isn't the same as what is in the issued JWT tokens)
+$auth_valid_issuer = Read-Host -Prompt 'Azure AD Valid Issuer'
 
 (Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
 (Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
 (Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
 (Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
 (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
+(Get-Content ".env").replace("<auth_authority>", $auth_authority) | Set-Content ".env"
+(Get-Content ".env").replace("<auth_audience>", $auth_audience) | Set-Content ".env"
+(Get-Content ".env").replace("<auth_valid_issuer>", $auth_valid_issuer) | Set-Content ".env"
 
 # git init only on a new repo
 git rev-parse --is-inside-work-tree | Out-Null

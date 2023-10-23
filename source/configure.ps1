@@ -17,8 +17,11 @@ ConnectionStrings__MessageBroker=<msg_broker_connection_string>
 DB_USER=<db_user>
 DB_PASSWORD=<db_pw>
 DB_ADMIN_PASSWORD=<db_admin_pw>
+AUTH__AUTHORITY=https://login.microsoftonline.com/<auth_tenant_id>/v2.0
+AUTH__AUDIENCE=<auth_audience>
+AUTH__VALID_ISSUER=https://sts.windows.net/<auth_tenant_id>/
 "@
-    Write-Host "Created new file and text content added"
+    Write-Host "Created new '.env' file."
 }
 
 # If none, create a ".variables.ps1" file
@@ -26,14 +29,14 @@ if (!(Test-Path "deployment/variables.ps1"))
 {
    New-Item -name "deployment/variables.ps1" -type "file" -value @"
 # Used only for LOCAL deployment!
-$SUBSCRIPTION=""
-$LOCATION=""
-$ENVIRONMENT=""
-$PROJECT_NAME=""
-$DB_USER=""
-$DB_PASSWORD=""
+`$SUBSCRIPTION=""
+`$LOCATION=""
+`$ENVIRONMENT=""
+`$PROJECT_NAME=""
+`$DB_USER=""
+`$DB_PASSWORD=""
 "@
-    Write-Host "Created new file and text content added"
+    Write-Host "Created new 'deployment/variables.ps1' file."
 }
 
 # Database administrator password
@@ -49,12 +52,18 @@ if (!($db_pw = Read-Host "Database user password [$db_pw_default]")) { $db_pw = 
 $msg_broker_connection_string = Read-Host -Prompt 'Message broker connection string (Azure Service Bus)'
 # Azure Application Insights Connection String
 $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights connection string (Azure)'
+# Azure AD Tenant Id
+$auth_tenant_id = Read-Host -Prompt 'Azure AD Tenant Id'
+# Claim identifying this API
+$auth_audience = Read-Host -Prompt 'This APIs audience identifier'
 
 (Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
 (Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
 (Get-Content ".env").replace("<db_pw>", $db_pw) | Set-Content ".env"
 (Get-Content ".env").replace("<msg_broker_connection_string>", $msg_broker_connection_string) | Set-Content ".env"
 (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
+(Get-Content ".env").replace("<auth_tenant_id>", $auth_tenant_id) | Set-Content ".env"
+(Get-Content ".env").replace("<auth_audience>", $auth_audience) | Set-Content ".env"
 
 # git init only on a new repo
 git rev-parse --is-inside-work-tree | Out-Null

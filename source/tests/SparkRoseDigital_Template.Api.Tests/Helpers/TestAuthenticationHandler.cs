@@ -20,7 +20,7 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
         {
             var claims = new List<Claim>
             {
-                new Claim("sub", "00000000-0000-0000-0000-000000000001")
+                new Claim("http://schemas.microsoft.com/identity/claims/objectidentifier", "00000000-0000-0000-0000-000000000001")
             };
             var identity = new ClaimsIdentity(claims, "Test");
             var principal = new ClaimsPrincipal(identity);

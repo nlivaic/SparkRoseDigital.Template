@@ -41,6 +41,7 @@
 	<PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
 	<PackageReference Include="OpenTelemetry.Extensions.Hosting" />
 	<PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
 
   <PropertyGroup>

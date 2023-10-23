@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.Exporter;
@@ -91,6 +92,15 @@ namespace SparkRoseDigital_Template.Api
             services.AddSpecificRepositories();
             services.AddCoreServices();
 
+            services
+                .AddAuthentication("Bearer")
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = _configuration["AUTH:AUTHORITY"];
+                    options.Audience = _configuration["AUTH:AUDIENCE"];
+                    options.TokenValidationParameters.ValidIssuer = _configuration["AUTH:VALID_ISSUER"];
+                });
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLoggingScopes();
@@ -141,6 +151,29 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddSwaggerGen(setupAction =>
             {
+                setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Description = "Bearer Authentication with JWT Token",
+                    Type = SecuritySchemeType.Http
+                });
+                setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
                 setupAction.SwaggerDoc(
                     "SparkRoseDigital_TemplateOpenAPISpecification",
                     new OpenApiInfo
@@ -188,14 +221,6 @@ namespace SparkRoseDigital_Template.Api
                     .WithExposedHeaders(Constants.Headers.Pagination)
                     .WithMethods(HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete);
             }));
-
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddIdentityServerAuthentication("Bearer", options =>
-            //    {
-            //        options.Authority = _configuration["IdentityProvider:Authority"];       // Our IDP. Middleware uses this to know where to find public keys and endpoints.
-            //        options.ApiName = _configuration["IdentityProvider:ApiName"];           // Allows the access token validator to check if the access token `audience` is for this API.
-            //    });
-            //services.AddAuthorization();
 
             services.AddMassTransit(x =>
             {

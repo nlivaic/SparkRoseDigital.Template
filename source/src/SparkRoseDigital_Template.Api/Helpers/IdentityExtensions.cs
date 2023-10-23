@@ -7,13 +7,13 @@ namespace SparkRoseDigital_Template.Api.Helpers
     public static class IdentityExtensions
     {
         public static string Username(this ClaimsPrincipal user) =>
-            user.Claims.SingleOrDefault(c => c.Type == "nickname").Value;
+            user.Claims.SingleOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name").Value;
 
         public static Guid? UserId(this ClaimsPrincipal user)
         {
-            var subClaim = user.Claims.SingleOrDefault(c => c.Type == "sub");
+            var subClaim = user.Claims.SingleOrDefault(c => c.Type == "http://schemas.microsoft.com/identity/claims/objectidentifier");
             return subClaim == null
-                ? (Guid?)null
+                ? null
                 : new Guid(subClaim.Value);
         }
     }

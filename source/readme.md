@@ -26,7 +26,7 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 12. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
 13. Approve PR. Let `build_pipeline` and `release_pipeline` do their work. You will probably need to open `release_pipeline` on the first run and approve some stuff.
 14. Provision Azure resources - `release_pipeline` will do the work here as well.
-    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provision.ps1` and this will provision everything to Azure. Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
+    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provisionLocal.ps1` and this will provision everything to Azure. It will NOT migrate the database! Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
@@ -102,7 +102,9 @@ When creating ADO pipelines, name them just like the files are named (minus the 
 
 In `release_pipeline.yml:72` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection_SparkRoseDigital_Template`) - make sure the name is the same as what is in Azure.
 
-If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure: more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
+If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure (essentially by creating a Service Principal and letting ADO know about it): more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
+
+Additionally, for the release pipeline to be able to register an API with Azure AD, you have to assign the Service Principal (above) an appropriate role (`Application Administrator`) on Entra, as described [here](https://stackoverflow.com/a/66204622/987827).
 
 #### Release pipeline Database Migrations and Provisioning resources
 
@@ -126,7 +128,7 @@ If you are logged into ADO and Azure with different usernames, then you will nee
 
 ## Provisioning resources on Azure manually
 
-Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own by executing `. ./provision.ps1`. Before running that script, look into `variables.ps1` file - it has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
+Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own by executing `. ./provisionLocal.ps1`. Before running that script, look into `variables.ps1` file - it has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
 
 ## Project naming
 

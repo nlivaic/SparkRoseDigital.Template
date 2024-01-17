@@ -78,7 +78,7 @@ stages:
             echo CommitDate: $(GitVersion.CommitDate)
           displayName: Current Version $(GitVersion.FullSemVer)
 
-        - script: dotnet build --configuration $(buildConfiguration) ./SparkRoseDigital_Template.sln
+        - script: dotnet build --configuration $(buildConfiguration) ./SparkRoseDigital.sln
           displayName: 'dotnet build $(buildConfiguration)'
 
         - task: DotNetCoreCLI@2
@@ -90,49 +90,49 @@ stages:
             configuration: $(buildConfiguration)
 
         - task: DotNetCoreCLI@2
-          displayName: 'dotnet publish SparkRoseDigital_Template.Api'
+          displayName: 'dotnet publish SparkRoseDigital.Api'
           inputs:
             command: publish
-            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Api -c $(buildConfiguration)'
-            workingDirectory: './src/SparkRoseDigital_Template.Api/'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital.Api -c $(buildConfiguration)'
+            workingDirectory: './src/SparkRoseDigital.Api/'
             zipAfterPublish: true
             publishWebProjects: false
 
         - task: DotNetCoreCLI@2
-          displayName: 'dotnet publish SparkRoseDigital_Template.WorkerServices'
+          displayName: 'dotnet publish SparkRoseDigital.WorkerServices'
           inputs:
             command: publish
-            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.WorkerServices -c $(buildConfiguration)'
-            workingDirectory: './src/SparkRoseDigital_Template.WorkerServices/'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital.WorkerServices -c $(buildConfiguration)'
+            workingDirectory: './src/SparkRoseDigital.WorkerServices/'
             zipAfterPublish: true
             publishWebProjects: false
 
         - task: DotNetCoreCLI@2
-          displayName: 'dotnet publish SparkRoseDigital_Template.Migrations'
+          displayName: 'dotnet publish SparkRoseDigital.Migrations'
           inputs:
             command: publish
-            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Migrations -c $(buildConfiguration)'
-            workingDirectory: './src/SparkRoseDigital_Template.Migrations/'
+            arguments: '-o $(Build.ArtifactStagingDirectory)/SparkRoseDigital.Migrations -c $(buildConfiguration)'
+            workingDirectory: './src/SparkRoseDigital.Migrations/'
             zipAfterPublish: false
             publishWebProjects: false
 
         - task: PublishPipelineArtifact@1
-          displayName: 'Publish artifacts SparkRoseDigital_Template.Api'
+          displayName: 'Publish artifacts SparkRoseDigital.Api'
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Api'
-            artifactName: 'drop.SparkRoseDigital_Template.Api'
+            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital.Api'
+            artifactName: 'drop.SparkRoseDigital.Api'
             publishLocation: pipeline
 
         - task: PublishPipelineArtifact@1
-          displayName: 'Publish artifacts SparkRoseDigital_Template.WorkerServices'
+          displayName: 'Publish artifacts SparkRoseDigital.WorkerServices'
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.WorkerServices'
-            artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
+            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital.WorkerServices'
+            artifactName: 'drop.SparkRoseDigital.WorkerServices'
             publishLocation: pipeline
 
         - task: PublishPipelineArtifact@1
-          displayName: 'Publish artifacts SparkRoseDigital_Template.Migrations'
+          displayName: 'Publish artifacts SparkRoseDigital.Migrations'
           inputs:
-            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Migrations'
-            artifactName: 'drop.SparkRoseDigital_Template.Migrations'
+            targetPath: '$(Build.ArtifactStagingDirectory)/SparkRoseDigital.Migrations'
+            artifactName: 'drop.SparkRoseDigital.Migrations'
             publishLocation: pipeline

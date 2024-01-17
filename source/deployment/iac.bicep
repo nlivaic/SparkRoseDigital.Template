@@ -4,6 +4,9 @@ param db_user string
 @secure()
 param db_password string
 param location string = resourceGroup().location
+param authAuthority string
+param authAudience string
+param authValidIssuer string
 
 // Object containing a mapping for location / region code
 var regionCodes = {
@@ -34,9 +37,12 @@ var service_bus_name = toLower('${baseName}${sb}1')
 var service_bus_RootManageSharedAccessKey_name = 'RootManageSharedAccessKey'
 var service_bus_ReadWritePolicy_name = 'ReadWritePolicy'
 
-var db_connection_string_env_var_name = 'SparkRoseDigital_TemplateDbConnection'
+var db_connection_string_env_var_name = 'SparkRoseDigitalDbConnection'
 var db_user_env_var_name = 'DB_USER'
 var db_password_env_var_name = 'DB_PASSWORD'
+var auth_authority_env_var_name = 'AUTH__AUTHORITY'
+var auth_audience_env_var_name = 'AUTH__AUDIENCE'
+var auth_valid_issuer_env_var_name = 'AUTH__VALID_ISSUER'
 var applicationinsights_connection_string_env_var_name = 'APPLICATIONINSIGHTS_CONNECTION_STRING'
 var messageBroker_connectionStrings_env_var_name = 'MessageBroker'
 
@@ -100,7 +106,7 @@ resource app_service_web 'Microsoft.Web/sites@2022-09-01' = {
       connectionStrings: [
         {
           name: db_connection_string_env_var_name
-          connectionString: 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          connectionString: 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Managed Identity;'
           type: 'SQLAzure'
         }
         {
@@ -133,12 +139,24 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
           name: applicationinsights_connection_string_env_var_name
           value: app_insights.properties.ConnectionString
       }
+      {
+        name: auth_authority_env_var_name
+        value: authAuthority
+      }
+      {
+        name: auth_audience_env_var_name
+        value: authAudience
+      }
+      {
+        name: auth_valid_issuer_env_var_name
+        value: authValidIssuer
+      }
     ]
     numberOfWorkers: 1
     netFrameworkVersion: 'v4.0'
     linuxFxVersion: 'DOTNETCORE|6.0'
     publishingUsername: appService_web_name
-    appCommandLine: 'dotnet SparkRoseDigital_Template.Api.dll'
+    appCommandLine: 'dotnet SparkRoseDigital.Api.dll'
     loadBalancing: 'LeastRequests'
     publicNetworkAccess: 'Enabled'
     ipSecurityRestrictions: [

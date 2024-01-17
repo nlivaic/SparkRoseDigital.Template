@@ -35,7 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		migrate.ps1 = migrate.ps1
 		nuget.config = nuget.config
-		provision.ps1 = provision.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.Api.Tests", "tests\SparkRoseDigital_Template.Api.Tests\SparkRoseDigital_Template.Api.Tests.csproj", "{A2A4A54E-156C-41A9-AB47-58F58B3CDB68}"
@@ -46,8 +45,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SparkRoseDigital_Template.C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deployment", "deployment", "{4D3D1A51-20AD-4511-9752-ABADC97AA84A}"
 	ProjectSection(SolutionItems) = preProject
+		deployment\entraApiRegistration.ps1 = deployment\entraApiRegistration.ps1
 		deployment\iac.bicep = deployment\iac.bicep
+		deployment\manifest.json = deployment\manifest.json
+		deployment\oauth2PermissionScopes.json = deployment\oauth2PermissionScopes.json
+		provisionLocal.ps1 = provisionLocal.ps1
+		deployment\provisionResourceGroup.ps1 = deployment\provisionResourceGroup.ps1
+		deployment\provisionResources.ps1 = deployment\provisionResources.ps1
 		deployment\resource-group.bicep = deployment\resource-group.bicep
+		deployment\servicePrincipalLockConfiguration.json = deployment\servicePrincipalLockConfiguration.json
 		deployment\variables.ps1 = deployment\variables.ps1
 	EndProjectSection
 EndProject

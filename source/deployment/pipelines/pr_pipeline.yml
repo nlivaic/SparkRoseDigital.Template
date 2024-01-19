@@ -80,7 +80,7 @@ stages:
             echo CommitDate: $(GitVersion.CommitDate)
           displayName: Current Version $(GitVersion.FullSemVer)
 
-        - script: dotnet build --configuration $(buildConfiguration) ./SparkRoseDigital.sln
+        - script: dotnet build --configuration $(buildConfiguration) ./SparkRoseDigital_Template.sln
           displayName: 'dotnet build $(buildConfiguration)'
 
         - task: DotNetCoreCLI@2
@@ -91,8 +91,8 @@ stages:
             publishTestResults: true
             configuration: $(buildConfiguration)
         
-        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital.Api -c $(buildConfiguration) ./src/SparkRoseDigital.Api/SparkRoseDigital.Api.csproj
-          displayName: 'dotnet publish SparkRoseDigital.Api'
+        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.Api -c $(buildConfiguration) ./src/SparkRoseDigital_Template.Api/SparkRoseDigital_Template.Api.csproj
+          displayName: 'dotnet publish SparkRoseDigital_Template.Api'
         
-        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital.WorkerServices -c $(buildConfiguration) ./src/SparkRoseDigital.WorkerServices/SparkRoseDigital.WorkerServices.csproj
-          displayName: 'dotnet publish SparkRoseDigital.WorkerServices'
+        - script: dotnet publish -o $(Build.ArtifactStagingDirectory)/SparkRoseDigital_Template.WorkerServices -c $(buildConfiguration) ./src/SparkRoseDigital_Template.WorkerServices/SparkRoseDigital_Template.WorkerServices.csproj
+          displayName: 'dotnet publish SparkRoseDigital_Template.WorkerServices'

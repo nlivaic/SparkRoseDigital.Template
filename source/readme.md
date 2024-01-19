@@ -5,10 +5,10 @@
 1. Run docker-desktop
 2. Run `./configure.ps1`
 3. Open solution using Visual Studio, set docker-compose as Startup project and run the solution
-4. Run `./create_migration.ps1 '' 'Initial migration'`
+4. Run `./create_migration.ps1 '' 'InitialMigration'`
 5. Run `./migrate.ps1`
 6. Run the solution again.
-6. Go to https://localhost:5000/index.html
+6. Go to http://localhost:5000/index.html
 
 At this point only `.gitignore` has been committed locally. Now you can make some changes to the source code, push it to GitHub and get it deployed to your provisioned Azure resources:
 

@@ -12,12 +12,12 @@ resources:
       - master                      # Will get triggered whenever the source pipeline runs on master branch.
 
 jobs:
-- deployment: sparkrosedigital_deploy_to_appservice
-  displayName: SparkRoseDigital Deploy to AppService
+- deployment: SparkRoseDigital_Template_deploy_to_appservice
+  displayName: SparkRoseDigital_Template Deploy to AppService
   environment: production
   variables:
-    adoProject: 'SparkRoseDigital'
-    azureServiceConnection: 'AzureConnection_SparkRoseDigital'
+    adoProject: 'SparkRoseDigital_Template'
+    azureServiceConnection: 'AzureConnection_SparkRoseDigital_Template'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
@@ -46,34 +46,34 @@ jobs:
         - download: none
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact SparkRoseDigital.Api'
+          displayName: 'Download Artifact SparkRoseDigital_Template.Api'
           inputs:
             buildType: 'specific'
             definition: build_pipeline
             buildVersionToDownload: 'latest'
-            artifactName: 'drop.SparkRoseDigital.Api'
+            artifactName: 'drop.SparkRoseDigital_Template.Api'
             project: '$(adoProject)'
-            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital.Api'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact SparkRoseDigital.WorkerServices'
+          displayName: 'Download Artifact SparkRoseDigital_Template.WorkerServices'
           inputs:
             buildType: 'specific'
             definition: build_pipeline
             buildVersionToDownload: 'latest'
-            artifactName: 'drop.SparkRoseDigital.WorkerServices'
+            artifactName: 'drop.SparkRoseDigital_Template.WorkerServices'
             project: '$(adoProject)'
-            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital.WorkerServices'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.WorkerServices'
 
         - task: DownloadPipelineArtifact@2
-          displayName: 'Download Artifact SparkRoseDigital.Migrations'
+          displayName: 'Download Artifact SparkRoseDigital_Template.Migrations'
           inputs:
             buildType: 'specific'
             definition: build_pipeline
             buildVersionToDownload: 'latest'
-            artifactName: 'drop.SparkRoseDigital.Migrations'
+            artifactName: 'drop.SparkRoseDigital_Template.Migrations'
             project: '$(adoProject)'
-            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital.Migrations'
+            downloadPath: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations'
 
         - task: AzureCLI@2
           displayName: 'Entra Api Registration'
@@ -83,9 +83,8 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/entraApiRegistration.ps1'
-            arguments: '$(PROJECT_NAME) $env:tenantId'
+            arguments: '$(PROJECT_NAME)'
             powerShellErrorActionPreference: stop
-            addSpnToEnvironment: true
         
         - task: AzureCLI@2
           displayName: 'Provision Resource Group'
@@ -97,7 +96,18 @@ jobs:
             scriptPath: './deployment/provisionResourceGroup.ps1'
             arguments: '$(LOCATION) $(ENVIRONMENT) $(PROJECT_NAME)'
             powerShellErrorActionPreference: stop
-        
+
+        - task: AzureCLI@2
+          displayName: 'Sql Entra-Only Auth - Disable'
+          name: 'SqlEntraOnlyAuthDisable'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/sqlEntraOnlyAuthDisable.ps1'
+            arguments: '$(provisionResourceGroup.resourceGroupName)'
+            powerShellErrorActionPreference: stop
+
         - task: AzureCLI@2
           displayName: 'Provision Resources'
           name: 'provisionResources'
@@ -106,18 +116,37 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/provisionResources.ps1'
-            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(DB_USER) $(DB_PASSWORD) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer)'
+            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SQL_ADMIN_PASSWORD) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer)'
             powerShellErrorActionPreference: stop
 
-        - script: dotnet $(Pipeline.Workspace)/drop/SparkRoseDigital.Migrations/SparkRoseDigital.Migrations.dll "$(provisionResources.dbConnection)" "$(DB_USER)" "$(DB_PASSWORD)" "$(Pipeline.Workspace)/drop/SparkRoseDigital.Migrations"
+        - task: AzureCLI@2
+          displayName: 'Sql Entra Auth'
+          name: 'sqlEntraAuth'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/sqlEntraAuth.ps1'
+            arguments: '$(SQL_ADMIN_USERNAME) $(SQL_ADMIN_PASSWORD) $(SQL_USERS_GROUP_NAME) $(provisionResourceGroup.resourceGroupName) $(provisionResources.appServiceWebName) $(provisionResources.sqlServerName)'
+            powerShellErrorActionPreference: stop
+            
+        - task: AzureCLI@2
           displayName: 'Migrate database'
+          name: 'migrateDatabase'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/migrate.ps1'
+            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(provisionResources.dbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SQL_ADMIN_PASSWORD)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(SQL_USERS_GROUP_NAME)"'
+            powerShellErrorActionPreference: stop
 
         - task: AzureWebApp@1
-          displayName: 'Deploy SparkRoseDigital.Api to App Service'
+          displayName: 'Deploy SparkRoseDigital_Template.Api to App Service'
           inputs:
             azureSubscription: 'AzureConnection'
             appType: 'webAppLinux'
             appName: '$(provisionResources.appServiceWebName)'
             resourceGroupName: '$(provisionResourceGroup.resourceGroupName)'
-            package: '$(Pipeline.Workspace)/drop/SparkRoseDigital.Api/**/*.zip'
+            package: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api/**/*.zip'
             runtimeStack: 'DOTNETCORE|6.0'

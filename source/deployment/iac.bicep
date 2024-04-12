@@ -37,7 +37,7 @@ var service_bus_name = toLower('${baseName}${sb}1')
 var service_bus_RootManageSharedAccessKey_name = 'RootManageSharedAccessKey'
 var service_bus_ReadWritePolicy_name = 'ReadWritePolicy'
 
-var db_connection_string_env_var_name = 'SparkRoseDigitalDbConnection'
+var db_connection_string_env_var_name = 'SparkRoseDigital_TemplateDbConnection'
 var db_user_env_var_name = 'DB_USER'
 var db_password_env_var_name = 'DB_PASSWORD'
 var auth_authority_env_var_name = 'AUTH__AUTHORITY'
@@ -106,7 +106,7 @@ resource app_service_web 'Microsoft.Web/sites@2022-09-01' = {
       connectionStrings: [
         {
           name: db_connection_string_env_var_name
-          connectionString: 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Managed Identity;'
+          connectionString: 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
           type: 'SQLAzure'
         }
         {
@@ -156,7 +156,7 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
     netFrameworkVersion: 'v4.0'
     linuxFxVersion: 'DOTNETCORE|6.0'
     publishingUsername: appService_web_name
-    appCommandLine: 'dotnet SparkRoseDigital.Api.dll'
+    appCommandLine: 'dotnet SparkRoseDigital_Template.Api.dll'
     loadBalancing: 'LeastRequests'
     publicNetworkAccess: 'Enabled'
     ipSecurityRestrictions: [
@@ -232,5 +232,6 @@ resource service_bus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
   }
 }
 
+output sqlServerName string = sqlserver_name
 output appServiceWebName string = appService_web_name
 output dbConnection string = 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'

@@ -28,7 +28,7 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 14. Provision Azure resources - `release_pipeline` will do the work here as well.
     * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provisionLocal.ps1` and this will provision everything to Azure. It will NOT migrate the database! Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
-At this point you have a local environment and Azure Service Bus fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
+At this point you have a local environment and Azure fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
 # Before You Get Started
 
@@ -109,12 +109,13 @@ Additionally, for the release pipeline to be able to register an API with Azure 
 #### Release pipeline Database Migrations and Provisioning resources
 
 `release_pipeline` deploys to resource group and resources based on pipeline variables:
-* `DB_PASSWORD` - administrator password of your choosing.
-* `DB_USER` - administrator username of your choosing.
-* `SUBSCRIPTION` - Azure subscription identifier
-* `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`.
-* `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to.
-* `PROJECT_NAME` - a moniker of your choosing to denote the project.
+* `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to. Can be any value (e.g. `dev`). Used to construct resource group name.
+* `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`. Translated to a shorthand when constructing resource group name (e.g. `we`).
+* `PROJECT_NAME` - a moniker of your choosing to denote the project. Used to construct resource group name.
+* `SQL_ADMIN_USER` - administrator username of your choosing.
+* `SQL_ADMIN_PASSWORD` - administrator password of your choosing.
+* `SQL_USERS_GROUP_NAME` - group of users allowed to access the database.
+* `SUBSCRIPTION` - Azure subscription identifier.
 
 #### First deployment run
 
@@ -157,3 +158,13 @@ Every next migration must contain the name of the migration immediately preceedi
 Command must be executed from solution root folder using Powershell. You will notice it is executing from a Docker container and Docker compose - the reason is this way there is only one `.env` which can be shared by all executeable projects in the solution (`Ąpi`, `Migrations`, `WorkerServices`).
 
     ./migrate.ps1
+
+# Azure
+
+* `release_pipeline` will provision following resources on Azure, based off of config files and scripts you can find in `./deployment` folder:
+  * SQL Server with a single database, using SQL authentication (username and password)
+  * Application Insights
+  * Service Bus
+  * App Service
+  * Entra:
+    * Register an API, create a Service Principal, expose the API and create one scope (`FullAccess`).

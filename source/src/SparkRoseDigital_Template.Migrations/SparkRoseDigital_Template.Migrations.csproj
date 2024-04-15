@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="SparkRoseDigital_TemplateScripts\0000_AzureSqlContainedUser.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dbup-sqlserver" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,10 +46,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SparkRoseDigital_TemplateScripts\" />
   </ItemGroup>
 
 </Project>

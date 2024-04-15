@@ -24,21 +24,6 @@ AUTH__VALID_ISSUER=https://sts.windows.net/<auth_tenant_id>/
     Write-Host "Created new '.env' file."
 }
 
-# If none, create a ".variables.ps1" file
-if (!(Test-Path "deployment/variables.ps1"))
-{
-   New-Item -name "deployment/variables.ps1" -type "file" -value @"
-# Used only for LOCAL deployment!
-`$SUBSCRIPTION=""
-`$LOCATION=""
-`$ENVIRONMENT=""
-`$PROJECT_NAME=""
-`$DB_USER=""
-`$DB_PASSWORD=""
-"@
-    Write-Host "Created new 'deployment/variables.ps1' file."
-}
-
 # Database administrator password
 $db_admin_pw_default = "Pa55w0rd_1337"
 if (!($db_admin_pw = Read-Host "Database admin password [$db_admin_pw_default]")) { $db_admin_pw = $db_admin_pw_default }

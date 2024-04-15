@@ -14,9 +14,10 @@ namespace SparkRoseDigital_Template.Migrations
             var dbUser = string.Empty;
             var dbPassword = string.Empty;
             var scriptsPath = string.Empty;
+            var sqlUsersGroupName = string.Empty;
 
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
-                ?? "Development";
+                ?? "Production";
             Console.WriteLine($"Environment: {env}.");
             var builder = new ConfigurationBuilder()
                 .AddJsonFile($"appsettings.json", true, true)
@@ -25,15 +26,22 @@ namespace SparkRoseDigital_Template.Migrations
 
             var config = builder.Build();
             InitializeParameters();
-            var connectionStringSparkRoseDigital_Template = new SqlConnectionStringBuilder(connectionString)
+            var connectionStringBuilderSparkRoseDigital_Template = new SqlConnectionStringBuilder(connectionString);
+            if (env.Equals("Development"))
             {
-                UserID = dbUser,
-                Password = dbPassword
-            }.ConnectionString;
-
+                connectionStringBuilderSparkRoseDigital_Template.UserID = dbUser;
+                connectionStringBuilderSparkRoseDigital_Template.Password = dbPassword;
+            }
+            else
+            {
+                connectionStringBuilderSparkRoseDigital_Template.UserID = dbUser;
+                connectionStringBuilderSparkRoseDigital_Template.Password = dbPassword;
+                connectionStringBuilderSparkRoseDigital_Template.Authentication = SqlAuthenticationMethod.ActiveDirectoryPassword;
+            }
             var upgraderSparkRoseDigital_Template =
                 DeployChanges.To
-                    .SqlDatabase(connectionStringSparkRoseDigital_Template)
+                    .SqlDatabase(connectionStringBuilderSparkRoseDigital_Template.ConnectionString)
+                    .WithVariable("SqlUsersGroupNameVariable", sqlUsersGroupName)
                     .WithScriptsFromFileSystem(
                         !string.IsNullOrWhiteSpace(scriptsPath)
                                 ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateScripts")
@@ -41,6 +49,10 @@ namespace SparkRoseDigital_Template.Migrations
                     .LogToConsole()
                     .Build();
             Console.WriteLine($"Now upgrading SparkRoseDigital_Template.");
+            if (env == "Development")
+            {
+                upgraderSparkRoseDigital_Template.MarkAsExecuted("0000_AzureSqlContainedUser.sql");
+            }
             var resultSparkRoseDigital_Template = upgraderSparkRoseDigital_Template.PerformUpgrade();
 
             if (!resultSparkRoseDigital_Template.Successful)
@@ -92,18 +104,22 @@ namespace SparkRoseDigital_Template.Migrations
 
             void InitializeParameters()
             {
+                // Local database, populated from .env file.
                 if (args.Length == 0)
                 {
                     connectionString = config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"];
                     dbUser = config["DB_USER"];
                     dbPassword = config["DB_PASSWORD"];
                 }
-                else if (args.Length == 4)
+
+                // Remote database
+                else if (args.Length == 5)
                 {
                     connectionString = args[0];
                     dbUser = args[1];
                     dbPassword = args[2];
                     scriptsPath = args[3];
+                    sqlUsersGroupName = args[4];
                 }
             }
         }

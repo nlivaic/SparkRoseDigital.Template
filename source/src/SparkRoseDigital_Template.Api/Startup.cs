@@ -27,6 +27,9 @@ using SparkRoseDigital.Infrastructure.HealthCheck;
 using SparkRoseDigital.Infrastructure.Logging;
 using SparkRoseDigital_Template.Api.Helpers;
 using SparkRoseDigital_Template.Api.Middlewares;
+using SparkRoseDigital_Template.Api;
+using SparkRoseDigital_Template.Api.Helpers;
+using SparkRoseDigital_Template.Api.Middlewares;
 using SparkRoseDigital_Template.Application;
 using SparkRoseDigital_Template.Core;
 using SparkRoseDigital_Template.Data;
@@ -76,12 +79,17 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
             {
-                var connString = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection") ?? string.Empty)
+                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection") ?? string.Empty);
+                if (_hostEnvironment.IsDevelopment())
                 {
-                    UserID = _configuration["DB_USER"] ?? string.Empty,
-                    Password = _configuration["DB_PASSWORD"] ?? string.Empty
-                };
-                options.UseSqlServer(connString.ConnectionString);
+                    sqlConnectionStringBuilder.UserID = _configuration["DB_USER"] ?? string.Empty;
+                    sqlConnectionStringBuilder.Password = _configuration["DB_PASSWORD"] ?? string.Empty;
+                }
+                else
+                {
+                    sqlConnectionStringBuilder.Authentication = SqlAuthenticationMethod.ActiveDirectoryManagedIdentity;
+                }
+                options.UseSqlServer(sqlConnectionStringBuilder.ConnectionString);
                 if (_hostEnvironment.IsDevelopment())
                 {
                     options.EnableSensitiveDataLogging(true);

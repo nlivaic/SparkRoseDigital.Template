@@ -26,7 +26,6 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 12. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
 13. Approve PR. Let `build_pipeline` and `release_pipeline` do their work. You will probably need to open `release_pipeline` on the first run and approve some stuff.
 14. Provision Azure resources - `release_pipeline` will do the work here as well.
-    * Manual provisioning: if you want to test your infrastructure out regardless of the pipeline, run `. ./provisionLocal.ps1` and this will provision everything to Azure. It will NOT migrate the database! Make sure you do `az login` first and log in to the correct subscription. Open `variables.ps1` and make sure everything is properly defined.
 
 At this point you have a local environment and Azure fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 
@@ -126,10 +125,6 @@ Additionally, for the release pipeline to be able to register an API with Azure 
 ### Branches
 
 **All** pipelines work with `master` branch . If you are using `main`, remember to do a search and replace.
-
-## Provisioning resources on Azure manually
-
-Even though the pipelines are built in such a way to take advantage of Bicep files to provision stuff on Azure, you can run those scripts on your own by executing `. ./provisionLocal.ps1`. Before running that script, look into `variables.ps1` file - it has all the parameters needed to provision, but you can change values if you wish. Make sure the variable values here are the same ones as in the release pipeline, otherwise you will end up with two different resource groups.
 
 ## Project naming
 

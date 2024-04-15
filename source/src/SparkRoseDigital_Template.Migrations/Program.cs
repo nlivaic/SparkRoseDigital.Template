@@ -49,6 +49,10 @@ namespace SparkRoseDigital_Template.Migrations
                     .LogToConsole()
                     .Build();
             Console.WriteLine($"Now upgrading SparkRoseDigital_Template.");
+            if (env == "Development")
+            {
+                upgraderSparkRoseDigital_Template.MarkAsExecuted("0000_AzureSqlContainedUser.sql");
+            }
             var resultSparkRoseDigital_Template = upgraderSparkRoseDigital_Template.PerformUpgrade();
 
             if (!resultSparkRoseDigital_Template.Successful)
@@ -100,7 +104,7 @@ namespace SparkRoseDigital_Template.Migrations
 
             void InitializeParameters()
             {
-                // Local database
+                // Local database, populated from .env file.
                 if (args.Length == 0)
                 {
                     connectionString = config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"];

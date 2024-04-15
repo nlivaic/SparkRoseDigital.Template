@@ -1,8 +1,8 @@
 param environment string
 param projectName string
-param db_user string
+param sql_admin_username string
 @secure()
-param db_password string
+param sql_admin_password string
 param location string = resourceGroup().location
 param authAuthority string
 param authAudience string
@@ -38,8 +38,6 @@ var service_bus_RootManageSharedAccessKey_name = 'RootManageSharedAccessKey'
 var service_bus_ReadWritePolicy_name = 'ReadWritePolicy'
 
 var db_connection_string_env_var_name = 'SparkRoseDigital_TemplateDbConnection'
-var db_user_env_var_name = 'DB_USER'
-var db_password_env_var_name = 'DB_PASSWORD'
 var auth_authority_env_var_name = 'AUTH__AUTHORITY'
 var auth_audience_env_var_name = 'AUTH__AUDIENCE'
 var auth_valid_issuer_env_var_name = 'AUTH__VALID_ISSUER'
@@ -50,8 +48,8 @@ resource sqlserver 'Microsoft.Sql/servers@2022-11-01-preview' = {
   name: sqlserver_name
   location: location
   properties: {
-    administratorLogin: db_user
-    administratorLoginPassword: db_password
+    administratorLogin: sql_admin_username
+    administratorLoginPassword: sql_admin_password
     version: '12.0'
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Enabled'
@@ -127,14 +125,6 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
   name: 'web'
   properties: {
     appSettings: [
-      {
-        name: db_user_env_var_name
-        value: db_user
-      }
-      {
-        name: db_password_env_var_name
-        value: db_password
-      }
       {
           name: applicationinsights_connection_string_env_var_name
           value: app_insights.properties.ConnectionString

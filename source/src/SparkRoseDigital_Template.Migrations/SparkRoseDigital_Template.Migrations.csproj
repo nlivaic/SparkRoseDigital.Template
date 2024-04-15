@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="SparkRoseDigital_TemplateScripts\0_AzureSqlContainedUser.sql" />
+    <None Remove="SparkRoseDigital_TemplateScripts\0000_AzureSqlContainedUser.sql" />
   </ItemGroup>
 
   <ItemGroup>

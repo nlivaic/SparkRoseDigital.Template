@@ -1,13 +1,13 @@
 version: '3.7'
 
 services:
-  testtemplate9.migrations:
+  sparkrosedigital_template.migrations:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     # image: ${DOCKER_REGISTRY-}testtemplate9sql
     env_file: .env
     build:
       context: .
-      dockerfile: src/TestTemplate9.Migrations/Dockerfile
+      dockerfile: src/SparkRoseDigital_Template.Migrations/Dockerfile
     extra_hosts:
       - "host.docker.internal:host-gateway"

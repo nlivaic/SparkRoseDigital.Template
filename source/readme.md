@@ -49,12 +49,14 @@ Most of the stuff is in the `.env` file. This is a git ignored file, but it has 
 
 ### Database configuration
 
-Database connection string for both `Api`, `WorkerServices` and `Migrations` projects is in the `.env` file. This was a deliberate choice, because I wanted the templated project to have a connection string automatically generated and in line with the name of the solution. You will notice there are two connection strings: `ConnectionStrings__SparkRoseDigital_TemplateDbConnection` is used by `Api` and `WorkerServices`. `Migrations` has a separate one `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection` because it is accessing the dockerized database from outside.
+This section describes how to connect to the database when running in a local Dockerized environment.
 
-Username and password for the database are provided as default values, but you can provide whatever values you want.
-Make sure you set the database-related variables (prefixed `DB_`) before you run the solution for the first time, otherwise the database will be configured with given administrator password and a username and password for the application user. If you don't change those values before running the solution you will have to delete the `sparkrosedigital_template.sql` container and accompanying volumes. If you change `DB_PASSWORD`, make sure the same value is set in `InitializeSparkRoseDigital_TemplateDb.sql` for the login as well.
+Database connection string for both `Api`, `WorkerServices` and `Migrations` projects is in the `.env` file. This was a deliberate choice, because then all the templated projects have a connection string automatically generated and in line with the name of the solution. You will notice there are two connection strings - `ConnectionStrings__SparkRoseDigital_TemplateDbConnection` is used by `Api` and `WorkerServices`, while `Migrations` project has a separate one `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection` because it is accessing the dockerized database from outside.
 
-When you first run the solution, an SQL script found in `src/InitializeSparkRoseDigital_TemplateDb.sql` is executed, creating the database with an admin account (password in `DB_ADMIN_PASSWORD`), login and user (`DB_USER` and `DB_PASSWORD`). User is then assigned to read, write and DDL roles.
+Username and password for the database are provided as default values through the `configure.ps1` script, but you can provide whatever values you want. 
+Make sure you set the database-related variables (prefixed `DB_`) before you run the solution for the first time, otherwise the database won't be configured properly. If you don't change those values before running the solution you will have to delete the `sparkrosedigital_template.sql` container and accompanying volumes. Even though the following is very unlikely, but if you do change `DB_PASSWORD` make sure the same value is set in `InitializeSparkRoseDigital_TemplateDb.sql` for the login as well.
+
+When you first run the solution a SQL script found in `src/InitializeSparkRoseDigital_TemplateDb.sql` is executed, creating the database with an admin account (password in `DB_ADMIN_PASSWORD`), login and user (`DB_USER` and `DB_PASSWORD`). User is then assigned read, write and DDL roles.
 
 Application is accessing the database as a `DB_USER`/`DB_PASSWORD`, with a generated connection string found in `ConnectionStrings__SparkRoseDigital_TemplateDbConnection` and `ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection`.
 
@@ -111,8 +113,7 @@ Additionally, for the release pipeline to be able to register an API with Azure 
 * `ENVIRONMENT` - a moniker of your choosing to describe what environment you are deploying to. Can be any value (e.g. `dev`). Used to construct resource group name.
 * `LOCATION` - must match names of regions Azure can understand, e.g. `westeurope`. Translated to a shorthand when constructing resource group name (e.g. `we`).
 * `PROJECT_NAME` - a moniker of your choosing to denote the project. Used to construct resource group name.
-* `SQL_ADMIN_USER` - administrator username of your choosing.
-* `SQL_ADMIN_PASSWORD` - administrator password of your choosing.
+* `SQL_ADMIN_USERNAME` - administrator username of your choosing.
 * `SQL_USERS_GROUP_NAME` - group of users allowed to access the database.
 * `SUBSCRIPTION` - Azure subscription identifier.
 
@@ -120,7 +121,7 @@ Additionally, for the release pipeline to be able to register an API with Azure 
 
 * `pr_pipeline` - on your first PR, the `pr_pipeline` will get triggered.
 * `build_pipeline` - once you merge the PR, the build pipeline will get triggered. It is similar to `pr_pipeline`, except it uploads artifacts.
-* `release_pipeline` - once the `build_pipeline` is done, `release_pipeline` will get triggered, but it will stall. You need to manually give a few permissions, it should start running from there on.
+* `release_pipeline` - once the `build_pipeline` is done, `release_pipeline` will get triggered, but it will stall. You need to manually give a few permissions, it should start running from there on. This pipeline will provision all the resources, as described in [Azure](#azure) section. It also migrates the database ([Running from the pipeline](#running-from-the-pipeline)).
 
 ### Branches
 
@@ -150,16 +151,30 @@ Every next migration must contain the name of the migration immediately preceedi
 
 ### Applying migrations
 
+#### Running locally 
+
 Command must be executed from solution root folder using Powershell. You will notice it is executing from a Docker container and Docker compose - the reason is this way there is only one `.env` which can be shared by all executeable projects in the solution (`Ąpi`, `Migrations`, `WorkerServices`).
 
     ./migrate.ps1
 
+#### Running from the pipeline
+
+As one of the last tasks, `release_pipeline` will execute a database migration using `Migrations` project. Even though deployed `Api` will connect to the database using MSI, migrations are still being executed from the pipeline directly and therefore require connecting to the database using the admin account. Sql admin account is configured using `SQL_ADMIN_USERNAME` pipeline variable and `SQL-ADMIN-PASSWORD` Key Vault secret. Pipeline is preconfigured to do this and no action is needed on your part.
+
 # Azure
 
 * `release_pipeline` will provision following resources on Azure, based off of config files and scripts you can find in `./deployment` folder:
-  * SQL Server with a single database, using SQL authentication (username and password)
+  * SQL Server with a single database, using Entra-based admin account and Managed Identity. Does **not** use SQL contained users, but relies on Entra for all access management.
   * Application Insights
   * Service Bus
-  * App Service
+  * App Service - talks to SQL using Managed Identity.
+  * Key Vault
+    * Azure Connection service principal ADO is assigned to `Key Vault Secrets Officer` role scoped to this Key Vault.
+    * Secrets created by the `release_pipeline`:
+        * `SQL-SA-PASSWORD` - generated by the pipeline (`secrets` task). This is the password used to deploy SQL Server to Azure. It is used only once, during the `release_pipeline` resource provisioning step. Since SQL Server used Entra-only authentication, this secret isn't used afterwards, nor is it useful anymore. You can delete it from Key Vault afterwards if you want.
+        * `SQL-ADMIN-PASSWORD` - generated by the pipeline (`secrets` task). This is the password for the username configured in `SQL_ADMIN_USERNAME` pipeline variable. You can use these credentials to connect to deployed SQL Server. These are the credentials fed by the`release_pipeline` to `Migrations` project.
+        * If you want additional secrets generated, edit `/deployment/secrets.ps1`.
   * Entra:
     * Register an API, create a Service Principal, expose the API and create one scope (`FullAccess`).
+    * `sqlusers` group - App Service Managed Identity is assigned to this group by the release pipeline.
+    * `sqladmin` user - Entra-based admin account, created by the release pipeline.

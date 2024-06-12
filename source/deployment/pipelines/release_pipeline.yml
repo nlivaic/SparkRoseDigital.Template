@@ -109,6 +109,37 @@ jobs:
             powerShellErrorActionPreference: stop
 
         - task: AzureCLI@2
+          displayName: 'Provision Key Vault'
+          name: 'provisionKeyVault'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/provisionKeyVault.ps1'
+            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName)'
+            powerShellErrorActionPreference: stop
+            addSpnToEnvironment: true
+
+        - task: AzureCLI@2
+          displayName: 'Secrets'
+          name: 'secrets'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/secrets.ps1'
+            arguments: '$(provisionKeyVault.keyVaultName)'
+            powerShellErrorActionPreference: stop
+
+        - task: AzureKeyVault@2
+          displayName: Azure Key Vault
+          inputs:
+            azureSubscription: 'AzureConnection'
+            KeyVaultName: '$(provisionKeyVault.keyVaultName)'
+            SecretsFilter: '*'
+            RunAsPreJob: false
+
+        - task: AzureCLI@2
           displayName: 'Provision Resources'
           name: 'provisionResources'
           inputs:
@@ -116,7 +147,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/provisionResources.ps1'
-            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SQL_ADMIN_PASSWORD) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer)'
+            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SQL-SA-PASSWORD) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer)'
             powerShellErrorActionPreference: stop
 
         - task: AzureCLI@2
@@ -127,7 +158,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/sqlEntraAuth.ps1'
-            arguments: '$(SQL_ADMIN_USERNAME) $(SQL_ADMIN_PASSWORD) $(SQL_USERS_GROUP_NAME) $(provisionResourceGroup.resourceGroupName) $(provisionResources.appServiceWebName) $(provisionResources.sqlServerName)'
+            arguments: '$(SQL_ADMIN_USERNAME) $(SQL-ADMIN-PASSWORD) $(SQL_USERS_GROUP_NAME) $(provisionResourceGroup.resourceGroupName) $(provisionResources.appServiceWebName) $(provisionResources.sqlServerName)'
             powerShellErrorActionPreference: stop
             
         - task: AzureCLI@2
@@ -138,7 +169,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/migrate.ps1'
-            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(provisionResources.dbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SQL_ADMIN_PASSWORD)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(SQL_USERS_GROUP_NAME)"'
+            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(provisionResources.dbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SQL-ADMIN-PASSWORD)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(SQL_USERS_GROUP_NAME)"'
             powerShellErrorActionPreference: stop
 
         - task: AzureWebApp@1

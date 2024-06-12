@@ -117,6 +117,7 @@ Write-Host "##[warning]--- Create a ServicePrincipal - END ---"
 ##################################
 ###  Return configuration
 ##################################
+Write-Host "##vso[task.setvariable variable=tenantId;isoutput=true]$tenantId"
 Write-Host "##vso[task.setvariable variable=authAuthority;isoutput=true]https://login.microsoftonline.com/$tenantId/v2.0"
 Write-Host "##vso[task.setvariable variable=authAudience;isoutput=true]api://$appRegistrationResultAppId"
 Write-Host "##vso[task.setvariable variable=authValidIssuer;isoutput=true]https://sts.windows.net/$tenantId/"

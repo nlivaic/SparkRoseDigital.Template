@@ -7,8 +7,3 @@ $resourceGroupName = $jsonResultRg.properties.outputs.resourceGroupName.value
 Write-Host "##[section]Created resource group named: $($resourceGroupName)"
 Write-Host "##vso[task.setvariable variable=resourceGroupName;isoutput=true]$resourceGroupName"
 Write-Host "##[warning]------ Create Resource Group END ------"
-
-# Used only for local deployments.
-[hashtable]$Rg = @{}
-$RG.ResourceGroupName = $resourceGroupName
-return $Rg

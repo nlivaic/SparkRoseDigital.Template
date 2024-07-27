@@ -76,11 +76,11 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
             {
-                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection") ?? string.Empty);
+                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_configuration["SparkRoseDigital_TemplateDbConnection"] ?? string.Empty);
                 if (_hostEnvironment.IsDevelopment())
                 {
-                    sqlConnectionStringBuilder.UserID = _configuration["DB_USER"] ?? string.Empty;
-                    sqlConnectionStringBuilder.Password = _configuration["DB_PASSWORD"] ?? string.Empty;
+                    sqlConnectionStringBuilder.UserID = _configuration["DbUser"] ?? string.Empty;
+                    sqlConnectionStringBuilder.Password = _configuration["DbPassword"] ?? string.Empty;
                 }
                 else
                 {
@@ -109,7 +109,7 @@ namespace SparkRoseDigital_Template.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLoggingScopes();
-            if (!string.IsNullOrEmpty(_configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+            if (!string.IsNullOrEmpty(_configuration["ApplicationInsightsConnectionString"]))
             {
                 services
                     .AddOpenTelemetry()
@@ -127,7 +127,7 @@ namespace SparkRoseDigital_Template.Api
                             .AddSource("MassTransit")
                             .AddAzureMonitorTraceExporter(o =>
                             {
-                                o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                o.ConnectionString = _configuration["ApplicationInsightsConnectionString"];
                             });
                     })
                     // Not supported by Application Insights yet.
@@ -229,7 +229,7 @@ namespace SparkRoseDigital_Template.Api
 
             services.AddMassTransit(x =>
             {
-                if (string.IsNullOrEmpty(_configuration.GetConnectionString("MessageBroker")))
+                if (string.IsNullOrEmpty(_configuration["MessageBroker"]))
                 {
                     x.UsingInMemory();
                 }
@@ -237,7 +237,7 @@ namespace SparkRoseDigital_Template.Api
                 {
                     x.UsingAzureServiceBus((ctx, cfg) =>
                     {
-                        cfg.Host(_configuration.GetConnectionString("MessageBroker"));
+                        cfg.Host(_configuration["MessageBroker"]);
 
                         // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
                         // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).

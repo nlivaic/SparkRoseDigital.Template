@@ -1,4 +1,4 @@
-param ($keyVaultName)
+param ($keyVaultName, $dbConnectionString, $messageBrokerConnectionString, $appInsightsConnectionString)
 
 # Will expose method NewPassword
 . $PSScriptRoot\secretGenerator.ps1
@@ -6,8 +6,11 @@ param ($keyVaultName)
 ################################################################
 ### Set Key Vault secrets to provided values.
 ################################################################
-$sqlSaPasswordSecretName = "SQL-SA-PASSWORD"
-$sqlAdminPasswordSecretName = "SQL-ADMIN-PASSWORD"
+$sqlSaPasswordSecretName = "SqlSaPassword"
+$sqlAdminPasswordSecretName = "SqlAdminPassword"
+$dbConnectionName = 'SparkRoseDigital_TemplateDbConnection'
+$messageBrokerName = 'MessageBroker'
+$applicationInsightsConnectionName = 'ApplicationInsightsConnectionString'
 
 # We have to check whether all the relevant secrets are in there.
 # If not, generate those secrets and store in Key Vault.
@@ -23,4 +26,34 @@ $exists = az keyvault secret list --vault-name $keyVaultName --query $query
 if ($exists -eq "false") {
 	az keyvault secret set --vault-name $keyVaultName --name $sqlAdminPasswordSecretName --value $(NewPassword) --output none
 	Write-Host "##[section]Set secret $sqlAdminPasswordSecretName"
+}
+
+################################################################
+### Set connection strings.
+################################################################
+if ($dbConnectionString -ne $null) {
+	$query = "contains([].id, 'https://$($keyVaultName).vault.azure.net/secrets/$($dbConnectionName)')"
+	$exists = az keyvault secret list --vault-name $keyVaultName --query $query
+	if ($exists -eq "false") {
+		az keyvault secret set --vault-name $keyVaultName --name $dbConnectionName --value "$($dbConnectionString)" --output none
+		Write-Host "##[section]Set secret $dbConnectionName"
+	}
+}
+
+if ($messageBrokerConnectionString -ne $null) {
+	$query = "contains([].id, 'https://$($keyVaultName).vault.azure.net/secrets/$($messageBrokerName)')"
+	$exists = az keyvault secret list --vault-name $keyVaultName --query $query
+	if ($exists -eq "false") {
+		az keyvault secret set --vault-name $keyVaultName --name $messageBrokerName --value "$($messageBrokerConnectionString)" --output none
+		Write-Host "##[section]Set secret $messageBrokerName"
+	}
+}
+
+if ($appInsightsConnectionString -ne $null) {
+	$query = "contains([].id, 'https://$($keyVaultName).vault.azure.net/secrets/$($applicationInsightsConnectionName)')"
+	$exists = az keyvault secret list --vault-name $keyVaultName --query $query
+	if ($exists -eq "false") {
+		az keyvault secret set --vault-name $keyVaultName --name $applicationInsightsConnectionName --value "$($appInsightsConnectionString)" --output none
+		Write-Host "##[section]Set secret $applicationInsightsConnectionName"
+	}
 }

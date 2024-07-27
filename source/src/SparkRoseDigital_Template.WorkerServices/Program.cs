@@ -59,10 +59,10 @@ namespace SparkRoseDigital_Template.WorkerServices
                     var hostEnvironment = hostContext.HostingEnvironment;
                     services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                     {
-                        var connString = new SqlConnectionStringBuilder(configuration.GetConnectionString("SparkRoseDigital_TemplateDbConnection"))
+                        var connString = new SqlConnectionStringBuilder(configuration["SparkRoseDigital_TemplateDbConnection"])
                         {
-                            UserID = configuration["DB_USER"],
-                            Password = configuration["DB_PASSWORD"]
+                            UserID = configuration["DbUser"],
+                            Password = configuration["DbPassword"]
                         };
                         options.UseSqlServer(connString.ConnectionString);
                         if (hostEnvironment.IsDevelopment())
@@ -84,7 +84,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                         x.AddConsumer<FaultConsumer>();
                         x.AddConsumer<FooCommandConsumer>(typeof(FooCommandConsumer.FooCommandConsumerDefinition));
 
-                        if (string.IsNullOrEmpty(configuration.GetConnectionString("MessageBroker")))
+                        if (string.IsNullOrEmpty(configuration["MessageBroker"]))
                         {
                             x.UsingInMemory();
                         }
@@ -92,7 +92,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                         {
                             x.UsingAzureServiceBus((ctx, cfg) =>
                             {
-                                cfg.Host(configuration.GetConnectionString("MessageBroker"));
+                                cfg.Host(configuration["MessageBroker"]);
 
                                 // Use the below line if you are not going with
                                 // SetKebabCaseEndpointNameFormatter() in the publishing project (see API project),
@@ -131,7 +131,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                             o.UseBusOutbox();
                         });
                     });
-                    if (!string.IsNullOrEmpty(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+                    if (!string.IsNullOrEmpty(configuration["ApplicationInsightsConnectionString"]))
                     {
                         services
                             .AddOpenTelemetry()
@@ -148,7 +148,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                                     .AddSource("MassTransit")
                                     .AddAzureMonitorTraceExporter(o =>
                                     {
-                                        o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                        o.ConnectionString = configuration["ApplicationInsightsConnectionString"];
                                     });
                             })//.WithMetrics(meterProviderBuilder =>
                               //{

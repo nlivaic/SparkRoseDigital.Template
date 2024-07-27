@@ -20,3 +20,6 @@ $keyVaultId = az keyvault show --name $keyVaultName --query id --output tsv
 # "Key Vault Secrets Officer" role, scoped to this key vault
 az role assignment create --assignee $servicePrincipalId --role "b86a8fe4-44ce-4948-aee5-eccb2c155cd7" --scope $keyVaultId
 Write-Host "##[warning]------ Assign Key Vault Roles to AzureConnection END ------"
+
+$vaultUri = az keyvault show --name $keyVaultName --query 'properties.vaultUri'
+Write-Host "##vso[task.setvariable variable=vaultUri;isoutput=true]$vaultUri"

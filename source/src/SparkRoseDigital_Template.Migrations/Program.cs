@@ -41,7 +41,7 @@ namespace SparkRoseDigital_Template.Migrations
             var upgraderSparkRoseDigital_Template =
                 DeployChanges.To
                     .SqlDatabase(connectionStringBuilderSparkRoseDigital_Template.ConnectionString)
-                    .WithVariable("SqlUsersGroupNameVariable", sqlUsersGroupName)
+                    .WithVariable("SqlUsersGroupNameVariable", sqlUsersGroupName)    // This is necessary to perform template variable replacement in the scripts.
                     .WithScriptsFromFileSystem(
                         !string.IsNullOrWhiteSpace(scriptsPath)
                                 ? Path.Combine(scriptsPath, "SparkRoseDigital_TemplateScripts")
@@ -107,12 +107,12 @@ namespace SparkRoseDigital_Template.Migrations
                 // Local database, populated from .env file.
                 if (args.Length == 0)
                 {
-                    connectionString = config["ConnectionStrings:SparkRoseDigital_TemplateDb_Migrations_Connection"];
-                    dbUser = config["DB_USER"];
-                    dbPassword = config["DB_PASSWORD"];
+                    connectionString = config["SparkRoseDigital_TemplateDb_Migrations_Connection"];
+                    dbUser = config["DbUser"];
+                    dbPassword = config["DbPassword"];
                 }
 
-                // Remote database
+                // Deployed database
                 else if (args.Length == 5)
                 {
                     connectionString = args[0];

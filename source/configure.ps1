@@ -10,16 +10,17 @@ Write-Output "If you want to edit a previously provided value, it is best to edi
 if (!(Test-Path ".env"))
 {
    New-Item -name ".env" -type "file" -value @"
-APPLICATIONINSIGHTS_CONNECTION_STRING=<applicationinsights_connection_string>
-ConnectionStrings__SparkRoseDigital_TemplateDbConnection=Data Source=sparkrosedigital_template.sql;Initial Catalog=SparkRoseDigital_TemplateDb
-ConnectionStrings__SparkRoseDigital_TemplateDb_Migrations_Connection=Data Source=host.docker.internal,1433;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
-ConnectionStrings__MessageBroker=<msg_broker_connection_string>
-DB_USER=<db_user>
-DB_PASSWORD=<db_pw>
-DB_ADMIN_PASSWORD=<db_admin_pw>
-AUTH__AUTHORITY=https://login.microsoftonline.com/<auth_tenant_id>/v2.0
-AUTH__AUDIENCE=<auth_audience>
-AUTH__VALID_ISSUER=https://sts.windows.net/<auth_tenant_id>/
+ApplicationInsightsConnectionString=<applicationinsights_connection_string>
+SparkRoseDigital_TemplateDbConnection=Data Source=sparkrosedigital_template.sql;Initial Catalog=SparkRoseDigital_TemplateDb
+SparkRoseDigital_TemplateDb_Migrations_Connection=Data Source=host.docker.internal,1433;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
+MessageBroker=<msg_broker_connection_string>
+DbUser=<db_user>
+DbPassword=<db_pw>
+DbAdminPassword=<db_admin_pw>
+AuthAuthority=https://login.microsoftonline.com/<auth_tenant_id>/v2.0
+AuthAudience=<auth_audience>
+AuthValidIssuer=https://sts.windows.net/<auth_tenant_id>/
+KeyVault__Uri=<keyvault_uri>
 "@
     Write-Host "Created new '.env' file."
 }
@@ -41,6 +42,8 @@ $applicationinsights_connection_string = Read-Host -Prompt 'Application Insights
 $auth_tenant_id = Read-Host -Prompt 'Azure AD Tenant Id'
 # Claim identifying this API
 $auth_audience = Read-Host -Prompt 'This APIs audience identifier'
+# Development environment Key Vault URI
+$keyvault_uri = Read-Host -Prompt 'Development environment Key Vault URI'
 
 (Get-Content ".env").replace("<db_admin_pw>", $db_admin_pw) | Set-Content ".env"
 (Get-Content ".env").replace("<db_user>", $db_user) | Set-Content ".env"
@@ -49,6 +52,7 @@ $auth_audience = Read-Host -Prompt 'This APIs audience identifier'
 (Get-Content ".env").replace("<applicationinsights_connection_string>", $applicationinsights_connection_string) | Set-Content ".env"
 (Get-Content ".env").replace("<auth_tenant_id>", $auth_tenant_id) | Set-Content ".env"
 (Get-Content ".env").replace("<auth_audience>", $auth_audience) | Set-Content ".env"
+(Get-Content ".env").replace("<keyvault_uri>", $keyvault_uri) | Set-Content ".env"
 
 # git init only on a new repo
 git rev-parse --is-inside-work-tree | Out-Null

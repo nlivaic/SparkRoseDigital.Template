@@ -1,12 +1,16 @@
-param ($environment, $projectName, $resourceGroupName, $sqlAdminUsername, $sqlAdminPassword, $authAuthority, $authAudience, $authValidIssuer)
+param ($environment, $projectName, $resourceGroupName, $sqlAdminUsername, $sqlAdminPassword, $authAuthority, $authAudience, $authValidIssuer, $vaultUri)
 
 Write-Host "##[warning]------ Create Resources START ------"
-$jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$environment projectName=$projectName sql_admin_username=$sqlAdminUsername sql_admin_password=$sqlAdminPassword authAuthority=$authAuthority authAudience=$authAudience authValidIssuer=$authValidIssuer | ConvertFrom-Json
+$jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$environment projectName=$projectName sql_admin_username=$sqlAdminUsername sql_admin_password=$sqlAdminPassword authAuthority=$authAuthority authAudience=$authAudience authValidIssuer=$authValidIssuer vault_uri=$vaultUri| ConvertFrom-Json
 $appServiceWebName = $jsonResultAll.properties.outputs.appServiceWebName.value
 $sqlServerName = $jsonResultAll.properties.outputs.sqlServerName.value
 
 Write-Host "##vso[task.setvariable variable=appServiceWebName;isoutput=true]$appServiceWebName"
 Write-Host "##vso[task.setvariable variable=sqlServerName;isoutput=true]$sqlServerName"
 $dbConnection = $jsonResultAll.properties.outputs.dbConnection.value
+$messageBrokerConnectionString = $jsonResultAll.properties.outputs.messageBrokerConnectionString.value
+$appInsightsConnectionString = $jsonResultAll.properties.outputs.appInsightsConnectionString.value
 Write-Host "##vso[task.setvariable variable=dbConnection;isoutput=true]$dbConnection"
+Write-Host "##vso[task.setvariable variable=messageBrokerConnectionString;isoutput=true]$messageBrokerConnectionString"
+Write-Host "##vso[task.setvariable variable=appInsightsConnectionString;isoutput=true]$appInsightsConnectionString"
 Write-Host "##[warning]------ Create Resources END ------"

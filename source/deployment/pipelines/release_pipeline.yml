@@ -17,7 +17,7 @@ jobs:
   environment: production
   variables:
     adoProject: 'SparkRoseDigital_Template'
-    azureServiceConnection: 'AzureConnection_SparkRoseDigital_Template'
+    azureServiceConnection: 'AzureConnection'
   pool:
     vmImage: 'ubuntu-latest'
   strategy:
@@ -147,7 +147,31 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/provisionResources.ps1'
-            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SQL-SA-PASSWORD) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer)'
+            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SqlSaPassword) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer) $(provisionKeyVault.vaultUri)'
+            powerShellErrorActionPreference: stop
+        
+        # Secrets.ps1 is used twice so as to store connection strings after the resources have been provisioned.
+        # It is idempotent so the secrets stored the first time will not be overwritten.
+        - task: AzureCLI@2
+          displayName: 'Secrets - Connection Strings'
+          name: 'secretsConnectionStrings'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/secrets.ps1'
+            arguments: '$(provisionKeyVault.keyVaultName) "$(provisionResources.dbConnection)" "$(provisionResources.messageBrokerConnectionString)" "$(provisionResources.appInsightsConnectionString)"'
+            powerShellErrorActionPreference: stop
+
+        - task: AzureCLI@2
+          displayName: 'Create MSI and User Group'
+          name: 'msiUserGroups'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/msiUserGroups.ps1'
+            arguments: '$(USERS_GROUP_NAME) $(provisionResourceGroup.resourceGroupName) $(provisionResources.appServiceWebName)'
             powerShellErrorActionPreference: stop
 
         - task: AzureCLI@2
@@ -158,8 +182,20 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/sqlEntraAuth.ps1'
-            arguments: '$(SQL_ADMIN_USERNAME) $(SQL-ADMIN-PASSWORD) $(SQL_USERS_GROUP_NAME) $(provisionResourceGroup.resourceGroupName) $(provisionResources.appServiceWebName) $(provisionResources.sqlServerName)'
+            arguments: '$(SQL_ADMIN_USERNAME) $(SqlAdminPassword) $(provisionResourceGroup.resourceGroupName) $(provisionResources.sqlServerName)'
             powerShellErrorActionPreference: stop
+
+        - task: AzureCLI@2
+          displayName: 'Sql Entra-Only Auth - Enable'
+          name: 'sqlEntraOnlyAuthEnable'
+          inputs:
+            azureSubscription: 'AzureConnection'
+            scriptType: pscore
+            scriptLocation: 'scriptPath'
+            scriptPath: './deployment/sqlEntraOnlyAuthEnable.ps1'
+            arguments: '$(provisionResourceGroup.resourceGroupName)'
+            powerShellErrorActionPreference: stop
+          condition: always()
             
         - task: AzureCLI@2
           displayName: 'Migrate database'
@@ -169,7 +205,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/migrate.ps1'
-            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(provisionResources.dbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SQL-ADMIN-PASSWORD)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(SQL_USERS_GROUP_NAME)"'
+            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(SparkRoseDigital_TemplateDbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SqlAdminPassword)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(USERS_GROUP_NAME)"'
             powerShellErrorActionPreference: stop
 
         - task: AzureWebApp@1

@@ -1,9 +1,9 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["src/SparkRoseDigital_Template.WorkerServices/SparkRoseDigital_Template.WorkerServices.csproj", "src/SparkRoseDigital_Template.WorkerServices/"]
 COPY ["src/SparkRoseDigital_Template.Core/SparkRoseDigital_Template.Core.csproj", "src/SparkRoseDigital_Template.Core/"]

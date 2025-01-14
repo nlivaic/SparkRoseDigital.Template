@@ -21,7 +21,7 @@ namespace SparkRoseDigital_Template.Application.Tests
             var target = new UnitOfWorkPipeline<Request, Response>(uowMock.Object);
 
             // Act
-            var result = await target.Handle(new Request(), default(CancellationToken), requestHandlerDelegateMock.Object);
+            var result = await target.Handle(new Request(), requestHandlerDelegateMock.Object, default(CancellationToken));
 
             // Assert
             requestHandlerDelegateMock.Verify(m => m(), Times.Once);
@@ -39,7 +39,7 @@ namespace SparkRoseDigital_Template.Application.Tests
             var target = new UnitOfWorkPipeline<Request, Response>(uowMock.Object);
 
             // Act
-            var result = await target.Handle(new Request(), default(CancellationToken), requestHandlerDelegate);
+            var result = await target.Handle(new Request(), requestHandlerDelegate, default(CancellationToken));
 
             // Assert
             Assert.Equal(response, result);
@@ -56,7 +56,7 @@ namespace SparkRoseDigital_Template.Application.Tests
 
             // Act, Assert
             await Assert.ThrowsAsync<Exception>(
-                () => target.Handle(new Request(), default(CancellationToken), requestHandlerDelegate));
+                () => target.Handle(new Request(), requestHandlerDelegate, default(CancellationToken)));
         }
 
         public class Request

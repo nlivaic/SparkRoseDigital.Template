@@ -108,7 +108,7 @@ resource app_service_web 'Microsoft.Web/sites@2022-09-01' = {
       //     type: 'SQLAzure'
       //   }
       // ]
-      linuxFxVersion: 'DOTNETCORE|6.0'
+      linuxFxVersion: 'DOTNETCORE|9.0'
     }
   }
 }
@@ -137,7 +137,7 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
     ]
     numberOfWorkers: 1
     netFrameworkVersion: 'v4.0'
-    linuxFxVersion: 'DOTNETCORE|6.0'
+    linuxFxVersion: 'DOTNETCORE|9.0'
     publishingUsername: appService_web_name
     appCommandLine: 'dotnet SparkRoseDigital_Template.Api.dll'
     loadBalancing: 'LeastRequests'

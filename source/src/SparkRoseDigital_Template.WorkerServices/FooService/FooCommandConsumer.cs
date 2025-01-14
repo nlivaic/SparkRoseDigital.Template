@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using SparkRoseDigital_Template.Core.Events;
 using SparkRoseDigital_Template.Data;
 
 namespace SparkRoseDigital_Template.WorkerServices.FooService
 {
-    public class FooCommandConsumer : IConsumer<IFooCommand>
+    public class FooCommandConsumer(ILogger<FooCommandConsumer> Logger) : IConsumer<IFooCommand>
     {
-        public Task Consume(ConsumeContext<IFooCommand> context) =>
-            Task.CompletedTask;
+        public Task Consume(ConsumeContext<IFooCommand> context)
+        {
+            Logger.LogInformation("Talking from FooCommandConsumer.");
+            return Task.CompletedTask;
+        }
 
         public class FooCommandConsumerDefinition : ConsumerDefinition<FooCommandConsumer>
         {

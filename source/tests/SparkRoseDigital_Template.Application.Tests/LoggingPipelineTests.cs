@@ -20,7 +20,7 @@ namespace SparkRoseDigital_Template.Application.Tests
             var target = new LoggingPipeline<Request, Response>(fakeLogger);
 
             // Act
-            var result = await target.Handle(new Request(), default(CancellationToken), requestHandlerDelegateMock.Object);
+            var result = await target.Handle(new Request(), requestHandlerDelegateMock.Object, default(CancellationToken));
 
             // Assert
             Assert.Equal(2, fakeLogger.LogEntriesInformation.Count);
@@ -39,7 +39,7 @@ namespace SparkRoseDigital_Template.Application.Tests
             var target = new LoggingPipeline<Request, Response>(fakeLogger);
 
             // Act
-            var result = await target.Handle(new Request(), default(CancellationToken), requestHandlerDelegate);
+            var result = await target.Handle(new Request(), requestHandlerDelegate, default(CancellationToken));
 
             // Assert
             Assert.Equal(response, result);
@@ -55,7 +55,7 @@ namespace SparkRoseDigital_Template.Application.Tests
 
             // Act, Assert
             await Assert.ThrowsAsync<Exception>(
-                () => target.Handle(new Request(), default(CancellationToken), requestHandlerDelegate));
+                () => target.Handle(new Request(), requestHandlerDelegate, default(CancellationToken)));
         }
     }
 }

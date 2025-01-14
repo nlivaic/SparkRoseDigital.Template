@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace SparkRoseDigital_Template.Application.Pipelines
 {
     public class LoggingPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
     {
         private readonly ILogger<TRequest> _logger;
 
@@ -16,8 +17,8 @@ namespace SparkRoseDigital_Template.Application.Pipelines
 
         public async Task<TResponse> Handle(
             TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Starting execution of {typeof(TRequest)}.");
             var response = await next();

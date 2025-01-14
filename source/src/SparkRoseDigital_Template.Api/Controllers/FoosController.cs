@@ -2,10 +2,9 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SparkRoseDigital_Template.Api.Helpers;
+using Microsoft.Extensions.Logging;
 using SparkRoseDigital_Template.Application.Questions.Commands;
 using SparkRoseDigital_Template.Application.Questions.Queries;
 
@@ -17,13 +16,16 @@ namespace SparkRoseDigital_Template.Api.Controllers
     {
         private readonly ISender _sender;
         private readonly IMapper _mapper;
+        private readonly ILogger<FoosController> _logger;
 
         public FoosController(
             ISender sender,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<FoosController> logger)
         {
             _sender = sender;
             _mapper = mapper;
+            _logger = logger;
         }
 
         /// <summary>
@@ -54,6 +56,7 @@ namespace SparkRoseDigital_Template.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<FooGetModel>> PostAsync([FromBody] CreateFooCommand createFooCommand)
         {
+            _logger.LogInformation("Creating foo with text: {Text}", createFooCommand.Text);
             var foo = await _sender.Send(createFooCommand);
             var response = _mapper.Map<FooGetModel>(foo);
             return CreatedAtRoute("GetFoo", new { id = foo.Id }, response);

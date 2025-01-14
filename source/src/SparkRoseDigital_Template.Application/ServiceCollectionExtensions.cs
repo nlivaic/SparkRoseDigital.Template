@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SparkRoseDigital_Template.Application.Pipelines;
 
 namespace SparkRoseDigital_Template.Application
@@ -8,9 +7,8 @@ namespace SparkRoseDigital_Template.Application
     {
         public static void AddSparkRoseDigital_TemplateApplicationHandlers(this IServiceCollection services)
         {
-            services.AddMediatR(typeof(ServiceCollectionExtensions).Assembly);
+            services.AddMediatR(config => config.RegisterServicesFromAssemblyContaining(typeof(ServiceCollectionExtensions)));
             services.AddPipelines();
-
             services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
         }
     }

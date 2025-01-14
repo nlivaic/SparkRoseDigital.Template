@@ -93,13 +93,24 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
             {
                 _options = new DbContextOptionsBuilder<SparkRoseDigital_TemplateDbContext>()
                     .UseLoggerFactory(new LoggerFactory(
-                        new[] {
-                        new TestLoggerProvider(
-                            message => testOutput?.WriteLine(message),
-                            // message => logs?.Add(message),
-                            LogLevel.Information
-                        )
-                        }
+                        [
+                            new TestLoggerProvider(
+                                message =>
+                                {
+                                    try
+                                    {
+                                        testOutput?.WriteLine(message);
+                                    }
+                                    catch (Exception)
+                                    {
+		                                // Ignore exception. This is due to some part of code trying to write after the test is finished,
+                                        // which threw System.AggregateException: An error occurred while writing to logger(s). (There is no currently active test.)
+                                    }
+                                },
+                                // message => logs?.Add(message),
+                                LogLevel.Information
+                            )
+                        ]
                     ))
                     .UseSqlServer(connection)
                     .Options;

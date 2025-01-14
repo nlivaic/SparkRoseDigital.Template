@@ -2,17 +2,17 @@ using System;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using MassTransit;
+using MassTransit.Logging;
+using MassTransit.Monitoring;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using SparkRoseDigital.Infrastructure.Caching;
-using SparkRoseDigital.Infrastructure.Logging;
 using SparkRoseDigital_Template.Common.MessageBroker.Middlewares.ErrorLogging;
 using SparkRoseDigital_Template.Common.MessageBroker.Middlewares.Tracing;
 using SparkRoseDigital_Template.Core;
@@ -35,7 +35,6 @@ namespace SparkRoseDigital_Template.WorkerServices
                 Log.Information("Starting up SparkRoseDigital_Template Worker Services.");
                 CreateHostBuilder(args)
                     .Build()
-                    .AddW3CTraceContextActivityLogging()
                     .Run();
             }
             catch (Exception ex)
@@ -59,11 +58,16 @@ namespace SparkRoseDigital_Template.WorkerServices
                     var hostEnvironment = hostContext.HostingEnvironment;
                     services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                     {
-                        var connString = new SqlConnectionStringBuilder(configuration["SparkRoseDigital_TemplateDbConnection"])
+                        var connString = new SqlConnectionStringBuilder(configuration["SparkRoseDigital_TemplateDbConnection"]);
+                        if (hostEnvironment.IsDevelopment())
                         {
-                            UserID = configuration["DbUser"],
-                            Password = configuration["DbPassword"]
-                        };
+                            connString.UserID = configuration["DbUser"] ?? string.Empty;
+                            connString.Password = configuration["DbPassword"] ?? string.Empty;
+                        }
+                        else
+                        {
+                            connString.Authentication = SqlAuthenticationMethod.ActiveDirectoryManagedIdentity;
+                        }
                         options.UseSqlServer(connString.ConnectionString);
                         if (hostEnvironment.IsDevelopment())
                         {
@@ -131,7 +135,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                             o.UseBusOutbox();
                         });
                     });
-                    if (!string.IsNullOrEmpty(configuration["ApplicationInsightsConnectionString"]))
+                    if (!string.IsNullOrEmpty(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
                     {
                         services
                             .AddOpenTelemetry()
@@ -145,27 +149,30 @@ namespace SparkRoseDigital_Template.WorkerServices
                                             .AddService(serviceName: WorkerAssemblyInfo.Value.GetName().Name))
                                     .AddEntityFrameworkCoreInstrumentation()
                                     .AddSqlClientInstrumentation()
-                                    .AddSource("MassTransit")
+                                    .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit ActivitySource
                                     .AddAzureMonitorTraceExporter(o =>
                                     {
-                                        o.ConnectionString = configuration["ApplicationInsightsConnectionString"];
+                                        o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
                                     });
-                            })//.WithMetrics(meterProviderBuilder =>
-                              //{
-                              //    meterProviderBuilder
-                              //        .SetResourceBuilder(
-                              //            ResourceBuilder
-                              //                .CreateDefault()
-                              //                .AddService(serviceName: "SparkRoseDigital_Template"))
-                              //        .AddAspNetCoreInstrumentation()
-                              //        .AddAzureMonitorMetricExporter(o =>
-                              //        {
-                              //            //o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91";
-                              //            o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/";
-                              //        })
-                              //        .AddConsoleExporter();
-                              //})
-                            .StartWithHost();
+                            })
+                            .WithMetrics(meterProviderBuilder =>
+                            {
+                                // Resource describing which Meters report on which metrics:
+                                // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/built-in-metrics
+                                // Reason you might want to refer to this resource is so you know what metrics to
+                                // look into when using Application Insights Metrics tab.
+                                meterProviderBuilder
+                                    .SetResourceBuilder(
+                                        ResourceBuilder
+                                            .CreateDefault()
+                                            .AddService(serviceName: WorkerAssemblyInfo.Value.GetName().Name))
+                                    .AddRuntimeInstrumentation()
+                                    .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter: https://masstransit.io/documentation/configuration/observability
+                                    .AddAzureMonitorMetricExporter(o =>
+                                    {
+                                        o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                    });
+                            });
                     }
                 });
     }

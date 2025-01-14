@@ -6,6 +6,8 @@ using SparkRoseDigital_Template.Common.Interfaces;
 namespace SparkRoseDigital_Template.Application.Pipelines
 {
     public class UnitOfWorkPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
+
     {
         private readonly IUnitOfWork _uow;
 
@@ -16,8 +18,8 @@ namespace SparkRoseDigital_Template.Application.Pipelines
 
         public async Task<TResponse> Handle(
             TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
             var response = await next();
             await _uow.SaveAsync();

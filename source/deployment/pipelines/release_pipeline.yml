@@ -43,6 +43,12 @@ jobs:
               [string] $buildName = "$($newVersion)"
               Write-Host "##vso[build.updatebuildnumber]$buildName"
 
+        - task: UseDotNet@2
+          displayName: Install .NET Core SDK
+          inputs:
+            packageType: 'sdk'
+            version: '9.x'
+
         - download: none
 
         - task: DownloadPipelineArtifact@2
@@ -216,4 +222,4 @@ jobs:
             appName: '$(provisionResources.appServiceWebName)'
             resourceGroupName: '$(provisionResourceGroup.resourceGroupName)'
             package: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Api/**/*.zip'
-            runtimeStack: 'DOTNETCORE|6.0'
+            runtimeStack: 'DOTNETCORE|9.0'

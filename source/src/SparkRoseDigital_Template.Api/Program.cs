@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using SparkRoseDigital.Infrastructure.Logging;
 using LoggerExtensions = SparkRoseDigital.Infrastructure.Logging.LoggerExtensions;
 
 namespace SparkRoseDigital_Template.Api
@@ -20,7 +19,6 @@ namespace SparkRoseDigital_Template.Api
                 Log.Information("Starting up SparkRoseDigital_Template.");
                 CreateHostBuilder(args)
                     .Build()
-                    .AddW3CTraceContextActivityLogging()
                     .Run();
             }
             catch (Exception ex)

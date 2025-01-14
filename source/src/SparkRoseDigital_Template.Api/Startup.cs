@@ -5,6 +5,8 @@ using System.Reflection;
 using Azure.Monitor.OpenTelemetry.Exporter;
 using FluentValidation.AspNetCore;
 using MassTransit;
+using MassTransit.Logging;
+using MassTransit.Monitoring;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +20,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -109,12 +110,16 @@ namespace SparkRoseDigital_Template.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddLoggingScopes();
-            if (!string.IsNullOrEmpty(_configuration["ApplicationInsightsConnectionString"]))
+            if (!string.IsNullOrEmpty(_configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
             {
                 services
                     .AddOpenTelemetry()
                     .WithTracing(tracerProviderBuilder =>
                     {
+                        if (_hostEnvironment.IsDevelopment())
+                        {
+                            tracerProviderBuilder.SetSampler<AlwaysOnSampler>();
+                        }
                         tracerProviderBuilder
                             .AddSource(ApiAssemblyInfo.Value.GetName().Name)
                             .SetResourceBuilder(
@@ -122,31 +127,35 @@ namespace SparkRoseDigital_Template.Api
                                     .CreateDefault()
                                     .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
                             .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
                             .AddEntityFrameworkCoreInstrumentation()
                             .AddSqlClientInstrumentation()
-                            .AddSource("MassTransit")
+                            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit ActivitySource
                             .AddAzureMonitorTraceExporter(o =>
                             {
-                                o.ConnectionString = _configuration["ApplicationInsightsConnectionString"];
+                                o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
                             });
                     })
-                    // Not supported by Application Insights yet.
-                    //.WithMetrics(meterProviderBuilder =>
-                    //{
-                    //    meterProviderBuilder
-                    //        .SetResourceBuilder(
-                    //            ResourceBuilder
-                    //                .CreateDefault()
-                    //                .AddService(serviceName: "SparkRoseDigital_Template"))
-                    //        .AddAspNetCoreInstrumentation()
-                    //        .AddAzureMonitorMetricExporter(o =>
-                    //        {
-                    //            //o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91";
-                    //            o.ConnectionString = "InstrumentationKey=f051d7dd-dbaf-450a-a6f1-9f78bc0f8c91;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/";
-                    //        })
-                    //        .AddConsoleExporter();
-                    //})
-                    .StartWithHost();
+                    .WithMetrics(meterProviderBuilder =>
+                    {
+                        // Resource describing which Meters report on which metrics:
+                        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/built-in-metrics
+                        // Reason you might want to refer to this resource is so you know what metrics to
+                        // look into when using Application Insights Metrics tab.
+                        meterProviderBuilder
+                            .SetResourceBuilder(
+                                ResourceBuilder
+                                    .CreateDefault()
+                                    .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
+                            .AddRuntimeInstrumentation()
+                            .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation()
+                            .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter: https://masstransit.io/documentation/configuration/observability
+                            .AddAzureMonitorMetricExporter(o =>
+                            {
+                                o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                            });
+                    });
             }
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly(), typeof(Startup).Assembly);

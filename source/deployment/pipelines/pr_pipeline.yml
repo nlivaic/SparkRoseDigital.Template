@@ -35,6 +35,12 @@ stages:
         - script: ls -al
           displayName: 'Basic Information - Directory Contents'
 
+        - task: UseDotNet@2
+          displayName: Install .NET Core SDK
+          inputs:
+            packageType: 'sdk'
+            version: '9.x'
+
         - task: gitversion/setup@0
           displayName: Install GitVersion
           inputs:

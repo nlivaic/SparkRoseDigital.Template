@@ -31,6 +31,12 @@ jobs:
               [string] $buildName = "$($newVersion)"
               Write-Host "##vso[build.updatebuildnumber]$buildName"
 
+        - task: UseDotNet@2
+          displayName: Install .NET Core SDK
+          inputs:
+            packageType: 'sdk'
+            version: '9.x'
+
         - download: none
 
         - task: DownloadPipelineArtifact@2

@@ -114,7 +114,7 @@ When creating ADO pipelines, name them just like the files are named (minus the 
 
 #### Azure Service Connection
 
-In `release_pipeline.yml:72` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection_SparkRoseDigital_Template`) - make sure the name is the same as what is in Azure.
+In `release_pipeline.yml:72` there is an Azure subscription name (property name `azureSubscription` with initial value `AzureConnection`) - make sure the name is the same as what is in Azure.
 
 If you are logged into ADO and Azure with different usernames, then you will need to go through additional steps to hook up ADO and Azure (essentially by creating a Service Principal and letting ADO know about it): more details [here](https://www.devcurry.com/2019/08/service-connection-from-azure-devops-to.html). The previous link describes the process nicely, but in case it is down try [this](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops#create-an-azure-resource-manager-service-connection-with-an-existing-service-principal) one.
 

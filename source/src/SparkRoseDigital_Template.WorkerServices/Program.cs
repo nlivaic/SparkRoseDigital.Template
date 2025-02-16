@@ -135,7 +135,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                             o.UseBusOutbox();
                         });
                     });
-                    if (!string.IsNullOrEmpty(configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+                    if (!string.IsNullOrEmpty(configuration["ApplicationInsightsConnectionString"]))
                     {
                         services
                             .AddOpenTelemetry()
@@ -152,7 +152,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                                     .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit ActivitySource
                                     .AddAzureMonitorTraceExporter(o =>
                                     {
-                                        o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                        o.ConnectionString = configuration["ApplicationInsightsConnectionString"];
                                     });
                             })
                             .WithMetrics(meterProviderBuilder =>
@@ -170,7 +170,7 @@ namespace SparkRoseDigital_Template.WorkerServices
                                     .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter: https://masstransit.io/documentation/configuration/observability
                                     .AddAzureMonitorMetricExporter(o =>
                                     {
-                                        o.ConnectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                                        o.ConnectionString = configuration["ApplicationInsightsConnectionString"];
                                     });
                             });
                     }

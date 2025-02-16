@@ -10,7 +10,7 @@ $sqlSaPasswordSecretName = "SqlSaPassword"
 $sqlAdminPasswordSecretName = "SqlAdminPassword"
 $dbConnectionName = 'SparkRoseDigital_TemplateDbConnection'
 $messageBrokerName = 'MessageBroker'
-$applicationInsightsConnectionName = 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+$applicationInsightsConnectionName = 'ApplicationInsightsConnectionString'
 
 # We have to check whether all the relevant secrets are in there.
 # If not, generate those secrets and store in Key Vault.

@@ -10,7 +10,7 @@ Write-Output "If you want to edit a previously provided value, it is best to edi
 if (!(Test-Path ".env"))
 {
    New-Item -name ".env" -type "file" -value @"
-APPLICATIONINSIGHTS_CONNECTION_STRING=<applicationinsights_connection_string>
+ApplicationInsightsConnectionString=<applicationinsights_connection_string>
 SparkRoseDigital_TemplateDbConnection=Data Source=sparkrosedigital_template.sql;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
 SparkRoseDigital_TemplateDb_Migrations_Connection=Data Source=host.docker.internal,1433;Initial Catalog=SparkRoseDigital_TemplateDb;Encrypt=False
 MessageBroker=<msg_broker_connection_string>

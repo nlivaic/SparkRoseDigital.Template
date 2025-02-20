@@ -42,6 +42,7 @@ var auth_authority_env_var_name = 'AuthAuthority'
 var auth_audience_env_var_name = 'AuthAudience'
 var auth_valid_issuer_env_var_name = 'AuthValidIssuer'
 var vault_uri_env_var_name = 'KeyVault__Uri'
+var applicationinsights_connectionstring_env_var_name = 'APPLICATIONINSIGHTS_CONNECTION_STRING'
 
 resource sqlserver 'Microsoft.Sql/servers@2022-11-01-preview' = {
   name: sqlserver_name
@@ -134,6 +135,10 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
         name: vault_uri_env_var_name
         value: vault_uri
       }
+      {
+        name: applicationinsights_connectionstring_env_var_name
+        value: app_insights.properties.ConnectionString
+      }
     ]
     numberOfWorkers: 1
     netFrameworkVersion: 'v4.0'
@@ -219,4 +224,3 @@ output sqlServerName string = sqlserver_name
 output appServiceWebName string = appService_web_name
 output dbConnection string = 'Server=tcp:${sqlserver.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlserver::sqlDb.name};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
 output messageBrokerConnectionString string = listKeys('${service_bus.id}/AuthorizationRules/${service_bus_ReadWritePolicy_name}', service_bus.apiVersion).primaryConnectionString
-output appInsightsConnectionString string = app_insights.properties.ConnectionString

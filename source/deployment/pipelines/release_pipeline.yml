@@ -166,7 +166,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/secrets.ps1'
-            arguments: '$(provisionKeyVault.keyVaultName) "$(provisionResources.dbConnection)" "$(provisionResources.messageBrokerConnectionString)" "$(provisionResources.appInsightsConnectionString)"'
+            arguments: '$(provisionKeyVault.keyVaultName) "$(provisionResources.dbConnection)" "$(provisionResources.messageBrokerConnectionString)"'
             powerShellErrorActionPreference: stop
 
         - task: AzureCLI@2

@@ -4,9 +4,6 @@ param sql_admin_username string
 @secure()
 param sql_admin_password string
 param location string = resourceGroup().location
-param authAuthority string
-param authAudience string
-param authValidIssuer string
 param vault_uri string
 
 // Object containing a mapping for location / region code
@@ -38,9 +35,6 @@ var service_bus_name = toLower('${baseName}${sb}1')
 var service_bus_RootManageSharedAccessKey_name = 'RootManageSharedAccessKey'
 var service_bus_ReadWritePolicy_name = 'ReadWritePolicy'
 
-var auth_authority_env_var_name = 'AuthAuthority'
-var auth_audience_env_var_name = 'AuthAudience'
-var auth_valid_issuer_env_var_name = 'AuthValidIssuer'
 var vault_uri_env_var_name = 'KeyVault__Uri'
 var applicationinsights_connectionstring_env_var_name = 'APPLICATIONINSIGHTS_CONNECTION_STRING'
 
@@ -119,18 +113,6 @@ resource app_service_appsetting 'Microsoft.Web/sites/config@2022-09-01' = {
   name: 'web'
   properties: {
     appSettings: [
-      {
-        name: auth_authority_env_var_name
-        value: authAuthority
-      }
-      {
-        name: auth_audience_env_var_name
-        value: authAudience
-      }
-      {
-        name: auth_valid_issuer_env_var_name
-        value: authValidIssuer
-      }
       {
         name: vault_uri_env_var_name
         value: vault_uri

@@ -1,7 +1,7 @@
-param ($environment, $projectName, $resourceGroupName, $sqlAdminUsername, $sqlAdminPassword, $authAuthority, $authAudience, $authValidIssuer, $vaultUri)
+param ($environment, $projectName, $resourceGroupName, $sqlAdminUsername, $sqlAdminPassword, $vaultUri)
 
 Write-Host "##[warning]------ Create Resources START ------"
-$jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$environment projectName=$projectName sql_admin_username=$sqlAdminUsername sql_admin_password=$sqlAdminPassword authAuthority=$authAuthority authAudience=$authAudience authValidIssuer=$authValidIssuer vault_uri=$vaultUri| ConvertFrom-Json
+$jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$environment projectName=$projectName sql_admin_username=$sqlAdminUsername sql_admin_password=$sqlAdminPassword vault_uri=$vaultUri| ConvertFrom-Json
 $appServiceWebName = $jsonResultAll.properties.outputs.appServiceWebName.value
 $sqlServerName = $jsonResultAll.properties.outputs.sqlServerName.value
 

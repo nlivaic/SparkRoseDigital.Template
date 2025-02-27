@@ -8,7 +8,7 @@ param ($keyVaultName, $dbConnectionString, $messageBrokerConnectionString, $auth
 ################################################################
 $sqlSaPasswordSecretName = "SqlSaPassword"
 $sqlAdminPasswordSecretName = "SqlAdminPassword"
-$dbConnectionName = 'TestTemplate14DbConnection'
+$dbConnectionName = 'SparkRoseDigital_TemplateDbConnection'
 $messageBrokerName = 'MessageBroker'
 $applicationInsightsConnectionName = 'ApplicationInsightsConnectionString'
 $authoritySecretName = "AuthAuthority"

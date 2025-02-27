@@ -26,6 +26,7 @@ At this point only `.gitignore` has been committed locally. Now you can make som
 12. Create a new feature branch `git checkout -b feature/my-first-feature`. Do your work, create a PR and let the `pr_pipeline` do its work.
 13. Approve PR. Let `build_pipeline` and `release_pipeline` do their work. You will probably need to open `release_pipeline` on the first run and approve some stuff.
 14. Provision Azure resources - `release_pipeline` will do the work here as well.
+15. Important security note: currently your API is not protected, even though everything is set up. You still need to apply `[Authorize]` attribute to your endpoint. It was done this way so as to simplify initial local development.
 
 At this point you have a local environment and Azure fully set up, along with ADO pipelines ready deploy your code to a working AppService. Start working on your features!
 

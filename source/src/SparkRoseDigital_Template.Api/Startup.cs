@@ -102,9 +102,9 @@ namespace SparkRoseDigital_Template.Api
                 .AddAuthentication("Bearer")
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = _configuration["AUTH:AUTHORITY"];
-                    options.Audience = _configuration["AUTH:AUDIENCE"];
-                    options.TokenValidationParameters.ValidIssuer = _configuration["AUTH:VALID_ISSUER"];
+                    options.Authority = _configuration["AuthAuthority"];
+                    options.Audience = _configuration["AuthAudience"];
+                    options.TokenValidationParameters.ValidIssuer = _configuration["AuthValidIssuer"];
                 });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

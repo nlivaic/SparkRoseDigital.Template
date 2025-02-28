@@ -153,7 +153,7 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/provisionResources.ps1'
-            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SqlSaPassword) $(entraApiRegistration.authAuthority) $(entraApiRegistration.authAudience) $(entraApiRegistration.authValidIssuer) $(provisionKeyVault.vaultUri)'
+            arguments: '$(ENVIRONMENT) $(PROJECT_NAME) $(provisionResourceGroup.resourceGroupName) $(SQL_ADMIN_USERNAME) $(SqlSaPassword) $(provisionKeyVault.vaultUri)'
             powerShellErrorActionPreference: stop
         
         # Secrets.ps1 is used twice so as to store connection strings after the resources have been provisioned.

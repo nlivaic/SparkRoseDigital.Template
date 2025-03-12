@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Azure.Monitor.OpenTelemetry.Exporter;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.Logging;
@@ -48,32 +49,16 @@ namespace SparkRoseDigital_Template.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddControllers(configure =>
-                {
-                    configure.ReturnHttpNotAcceptable = true;
-                    configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                    configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status404NotFound));
-                    configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(object), StatusCodes.Status406NotAcceptable));
-                    configure.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
-                })
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.InvalidModelStateResponseFactory = actionContext =>
-                    {
-                        var actionExecutingContext = actionContext as ActionExecutingContext;
-                        var validationProblemDetails = ValidationProblemDetailsFactory.Create(actionContext);
-                        if (actionContext.ModelState.ErrorCount > 0
-                            && actionExecutingContext?.ActionArguments.Count == actionContext.ActionDescriptor.Parameters.Count)
-                        {
-                            validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
-                            return new UnprocessableEntityObjectResult(validationProblemDetails);
-                        }
-                        validationProblemDetails.Status = StatusCodes.Status400BadRequest;
-                        return new BadRequestObjectResult(validationProblemDetails);
-                    };
-                })
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddControllers(configure =>
+            {
+                configure.ReturnHttpNotAcceptable = true;
+                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
+                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status404NotFound));
+                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(object), StatusCodes.Status406NotAcceptable));
+                configure.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
+            });
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<Startup>();
 
             services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
             {

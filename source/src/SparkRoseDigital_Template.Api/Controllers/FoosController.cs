@@ -5,13 +5,15 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SparkRoseDigital_Template.Application.Questions.Commands;
-using SparkRoseDigital_Template.Application.Questions.Queries;
+using SparkRoseDigital_Template.Api.Models;
+using SparkRoseDigital_Template.Application.Foos.Commands;
+using SparkRoseDigital_Template.Application.Foos.Queries;
 
 namespace SparkRoseDigital_Template.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    //[Authorize]
     public class FoosController : ControllerBase
     {
         private readonly ISender _sender;
@@ -46,18 +48,18 @@ namespace SparkRoseDigital_Template.Api.Controllers
         /// <summary>
         /// Create a new foo.
         /// </summary>
-        /// <param name="createFooCommand">Foo create body.</param>
+        /// <param name="request">Foo create body.</param>
         /// <returns>Newly created foo.</returns>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        //[Authorize]
         [HttpPost]
-        public async Task<ActionResult<FooGetModel>> PostAsync([FromBody] CreateFooCommand createFooCommand)
+        public async Task<ActionResult<FooGetModel>> PostAsync([FromBody] CreateFooRequest request)
         {
-            _logger.LogInformation("Creating foo with text: {Text}", createFooCommand.Text);
-            var foo = await _sender.Send(createFooCommand);
+            _logger.LogInformation("Creating foo with text: {Text}", request.Text);
+            var command = _mapper.Map<CreateFooCommand>(request);
+            var foo = await _sender.Send(command);
             var response = _mapper.Map<FooGetModel>(foo);
             return CreatedAtRoute("GetFoo", new { id = foo.Id }, response);
         }
@@ -70,11 +72,12 @@ namespace SparkRoseDigital_Template.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        //[Authorize]
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutAsync([FromRoute]Guid id, [FromBody] UpdateFooCommand updateFooCommand)
+        public async Task<ActionResult> PutAsync([FromBody] UpdateFooRequest request)
         {
-            await _sender.Send(updateFooCommand);
+            _logger.LogInformation("Updating foo {id} with text: {Text}", request.Id, request.Text);
+            var command = _mapper.Map<UpdateFooCommand>(request);
+            await _sender.Send(command);
             return NoContent();
         }
 
@@ -85,7 +88,6 @@ namespace SparkRoseDigital_Template.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [Produces("application/json")]
-        //[Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(Guid id)
         {

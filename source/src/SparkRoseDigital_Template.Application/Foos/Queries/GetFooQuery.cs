@@ -5,7 +5,7 @@ using AutoMapper;
 using MediatR;
 using SparkRoseDigital_Template.Core.Entities;
 
-namespace SparkRoseDigital_Template.Application.Questions.Queries
+namespace SparkRoseDigital_Template.Application.Foos.Queries
 {
     public class GetFooQuery : IRequest<FooGetModel>
     {

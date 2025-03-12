@@ -11,8 +11,8 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
     public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticationOptions>
     {
         public TestAuthenticationHandler(IOptionsMonitor<TestAuthenticationOptions> options,
-            ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
-            : base(options, logger, encoder, clock)
+            ILoggerFactory logger, UrlEncoder encoder)
+            : base(options, logger, encoder)
         {
         }
 

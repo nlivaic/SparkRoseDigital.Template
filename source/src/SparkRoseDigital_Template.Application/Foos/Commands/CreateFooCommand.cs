@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using MassTransit;
 using MediatR;
-using SparkRoseDigital_Template.Application.Questions.Queries;
+using SparkRoseDigital_Template.Application.Foos.Queries;
 using SparkRoseDigital_Template.Common.Exceptions;
 using SparkRoseDigital_Template.Common.Interfaces;
 using SparkRoseDigital_Template.Core.Entities;
 using SparkRoseDigital_Template.Core.Events;
 
-namespace SparkRoseDigital_Template.Application.Questions.Commands
+namespace SparkRoseDigital_Template.Application.Foos.Commands
 {
     public class CreateFooCommand : IRequest<FooGetModel>
     {
@@ -41,10 +41,10 @@ namespace SparkRoseDigital_Template.Application.Questions.Commands
                 await _repository.AddAsync(foo);
 
                 // sending to queue
-                await _publishEndpoint.Publish<IFooCommand>(new { Text = foo.Text });
+                await _publishEndpoint.Publish<IFooCommand>(new { foo.Text });
 
                 // sending to topic
-                await _publishEndpoint.Publish<IFooEvent>(new { Text = foo.Text });
+                await _publishEndpoint.Publish<IFooEvent>(new { foo.Text });
                 return _mapper.Map<FooGetModel>(foo);
             }
         }

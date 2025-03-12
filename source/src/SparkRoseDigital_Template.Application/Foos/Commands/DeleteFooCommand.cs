@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace SparkRoseDigital_Template.Application.Questions.Commands
+namespace SparkRoseDigital_Template.Application.Foos.Commands
 {
     public class DeleteFooCommand : IRequest<Unit>
     {

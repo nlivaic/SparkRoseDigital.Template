@@ -3,19 +3,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace SparkRoseDigital_Template.Application.Foos.Commands
+namespace SparkRoseDigital_Template.Application.Foos.Commands;
+
+public class DeleteFooCommand : IRequest<Unit>
 {
-    public class DeleteFooCommand : IRequest<Unit>
+    public Guid Id { get; set; }
+
+    private class DeleteFooCommandHandler : IRequestHandler<DeleteFooCommand, Unit>
     {
-        public Guid Id { get; set; }
-
-        private class DeleteFooCommandHandler : IRequestHandler<DeleteFooCommand, Unit>
+        public DeleteFooCommandHandler()
         {
-            public DeleteFooCommandHandler()
-            {
-            }
-
-            public Task<Unit> Handle(DeleteFooCommand request, CancellationToken cancellationToken) => Task.FromResult(Unit.Value);
         }
+
+        public Task<Unit> Handle(DeleteFooCommand request, CancellationToken cancellationToken) => Task.FromResult(Unit.Value);
     }
 }

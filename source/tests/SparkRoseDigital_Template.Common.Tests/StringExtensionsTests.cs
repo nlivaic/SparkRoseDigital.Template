@@ -1,34 +1,33 @@
 using SparkRoseDigital_Template.Common.Extensions;
 using Xunit;
 
-namespace SparkRoseDigital_Template.Common.Tests
+namespace SparkRoseDigital_Template.Common.Tests;
+
+public class StringExtensionsTests
 {
-    public class StringExtensionsTests
+    [Fact]
+    public void StringExtensionsTests_CanCapitalizeNonNullStrings_Successfully()
     {
-        [Fact]
-        public void StringExtensionsTests_CanCapitalizeNonNullStrings_Successfully()
-        {
-            // Arrange
-            var target = "target string";
+        // Arrange
+        var target = "target string";
 
-            // Act
-            var result = target.CapitalizeFirstLetter();
+        // Act
+        var result = target.CapitalizeFirstLetter();
 
-            // Assert
-            Assert.Equal("Target string", result);
-        }
+        // Assert
+        Assert.Equal("Target string", result);
+    }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("   ")]
-        public void StringExtensionsTests_SkipsNullOrWhiteSpaceStrings_Successfully(string target)
-        {
-            // Act
-            var result = target.CapitalizeFirstLetter();
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void StringExtensionsTests_SkipsNullOrWhiteSpaceStrings_Successfully(string target)
+    {
+        // Act
+        var result = target.CapitalizeFirstLetter();
 
-            // Assert
-            Assert.Equal(target, result);
-        }
+        // Assert
+        Assert.Equal(target, result);
     }
 }

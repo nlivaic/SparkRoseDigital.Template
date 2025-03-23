@@ -33,342 +33,341 @@ using SparkRoseDigital_Template.Application;
 using SparkRoseDigital_Template.Core;
 using SparkRoseDigital_Template.Data;
 
-namespace SparkRoseDigital_Template.Api
+namespace SparkRoseDigital_Template.Api;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration _configuration;
+    private readonly IHostEnvironment _hostEnvironment;
+
+    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        private readonly IConfiguration _configuration;
-        private readonly IHostEnvironment _hostEnvironment;
-
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
-        {
-            _configuration = configuration;
-            _hostEnvironment = hostEnvironment;
-        }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllers(configure =>
-            {
-                configure.ReturnHttpNotAcceptable = true;
-                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status404NotFound));
-                configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(object), StatusCodes.Status406NotAcceptable));
-                configure.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
-            });
-            services.AddFluentValidationAutoValidation();
-            services.AddValidatorsFromAssemblyContaining<Startup>();
-
-            services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
-            {
-                var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_configuration["SparkRoseDigital_TemplateDbConnection"] ?? string.Empty);
-                if (_hostEnvironment.IsDevelopment())
-                {
-                    sqlConnectionStringBuilder.UserID = _configuration["DbUser"] ?? string.Empty;
-                    sqlConnectionStringBuilder.Password = _configuration["DbPassword"] ?? string.Empty;
-                }
-                else
-                {
-                    sqlConnectionStringBuilder.Authentication = SqlAuthenticationMethod.ActiveDirectoryManagedIdentity;
-                }
-                options.UseSqlServer(sqlConnectionStringBuilder.ConnectionString);
-                if (_hostEnvironment.IsDevelopment())
-                {
-                    options.EnableSensitiveDataLogging(true);
-                }
-            });
-
-            services.AddGenericRepository();
-            services.AddSpecificRepositories();
-            services.AddCoreServices();
-
-            services
-                .AddAuthentication("Bearer")
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = _configuration["AuthAuthority"];
-                    options.Audience = _configuration["AuthAudience"];
-                    options.TokenValidationParameters.ValidIssuer = _configuration["AuthValidIssuer"];
-                });
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            services.AddLoggingScopes();
-            if (!string.IsNullOrEmpty(_configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-            {
-                services
-                    .AddOpenTelemetry()
-                    .WithTracing(tracerProviderBuilder =>
-                    {
-                        if (_hostEnvironment.IsDevelopment())
-                        {
-                            tracerProviderBuilder.SetSampler<AlwaysOnSampler>();
-                        }
-                        tracerProviderBuilder
-                            .AddSource(ApiAssemblyInfo.Value.GetName().Name)
-                            .SetResourceBuilder(
-                                ResourceBuilder
-                                    .CreateDefault()
-                                    .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
-                            .AddAspNetCoreInstrumentation()
-                            .AddHttpClientInstrumentation()
-                            .AddEntityFrameworkCoreInstrumentation()
-                            .AddSqlClientInstrumentation()
-                            .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit ActivitySource
-                            .AddAzureMonitorTraceExporter(o =>
-                            {
-                                o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
-                            });
-                    })
-                    .WithMetrics(meterProviderBuilder =>
-                    {
-                        // Resource describing which Meters report on which metrics:
-                        // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/built-in-metrics
-                        // Reason you might want to refer to this resource is so you know what metrics to
-                        // look into when using Application Insights Metrics tab.
-                        meterProviderBuilder
-                            .SetResourceBuilder(
-                                ResourceBuilder
-                                    .CreateDefault()
-                                    .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
-                            .AddRuntimeInstrumentation()
-                            .AddAspNetCoreInstrumentation()
-                            .AddHttpClientInstrumentation()
-                            .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter: https://masstransit.io/documentation/configuration/observability
-                            .AddAzureMonitorMetricExporter(o =>
-                            {
-                                o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
-                            });
-                    });
-            }
-
-            services.AddAutoMapper(Assembly.GetExecutingAssembly(), typeof(Startup).Assembly);
-
-            services.AddSingleton<ICache, Cache>();
-            services.AddMemoryCache();
-
-            services.AddSwaggerGen(setupAction =>
-            {
-                setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Name = "Authorization",
-                    Description = "Bearer Authentication with JWT Token",
-                    Type = SecuritySchemeType.Http
-                });
-                setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "Bearer",
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        },
-                        new List<string>()
-                    }
-                });
-                setupAction.SwaggerDoc(
-                    "SparkRoseDigital_TemplateOpenAPISpecification",
-                    new OpenApiInfo
-                    {
-                        Title = "SparkRoseDigital_Template API",
-                        Version = "v1",
-                        Description = "This API allows access to SparkRoseDigital_Template.",
-                        Contact = new OpenApiContact
-                        {
-                            Name = "Author Name",
-                            Url = new Uri("https://github.com")
-                        },
-                        License = new OpenApiLicense
-                        {
-                            Name = "MIT",
-                            Url = new Uri("https://www.opensource.org/licenses/MIT")
-                        },
-                        TermsOfService = new Uri("https://www.my-terms-of-service.com")
-                    });
-
-                // A workaround for having multiple POST methods on one controller.
-                // setupAction.ResolveConflictingActions(r => r.First());
-                setupAction.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SparkRoseDigital_Template.Api.xml"));
-            });
-
-            // Commented out as we are running front end as a standalone app.
-            // services.AddSpaStaticFiles(configuration =>
-            // {
-            //     configuration.RootPath = "ClientApp/build";
-            // });
-            services.AddCors(o => o.AddPolicy("All", builder =>
-            {
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .WithExposedHeaders(Constants.Headers.Pagination);
-            }));
-
-            services.AddCors(o => o.AddPolicy("SparkRoseDigital_TemplateClient", builder =>
-            {
-                var allowedOrigins = _configuration["AllowedOrigins"]?.Split(',') ?? Array.Empty<string>();
-                builder
-                    .WithOrigins(allowedOrigins)
-                    .WithHeaders("Authorization", "Content-Type")
-                    .WithExposedHeaders(Constants.Headers.Pagination)
-                    .WithMethods(HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete);
-            }));
-
-            services.AddMassTransit(x =>
-            {
-                if (string.IsNullOrEmpty(_configuration["MessageBroker"]))
-                {
-                    x.UsingInMemory();
-                }
-                else
-                {
-                    x.UsingAzureServiceBus((ctx, cfg) =>
-                    {
-                        cfg.Host(_configuration["MessageBroker"]);
-
-                        // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
-                        // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
-                        // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
-                    });
-                }
-                x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
-                {
-                    // configure which database lock provider to use (Postgres, SqlServer, or MySql)
-                    o.UseSqlServer();
-
-                    // enable the bus outbox
-                    o.UseBusOutbox();
-                    o.QueryDelay = TimeSpan.FromSeconds(15);
-                });
-            });
-            services.AddSparkRoseDigital_TemplateApplicationHandlers();
-
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders =
-                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            });
-
-            services
-                .AddHealthChecks()
-                .AddDbContextCheck<SparkRoseDigital_TemplateDbContext>();
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseHostLoggingMiddleware();
-
-            // First use of Logging Exceptions.
-            // This instance is here to catch and log any exceptions coming from middlewares
-            // executed early in the pipeline.
-            app.UseApiExceptionHandler(options =>
-            {
-                options.ApiErrorHandler = UpdateApiErrorResponse;
-                options.LogLevelHandler = LogLevelHandler;
-            });
-
-            // Use headers forwarded by reverse proxy.
-            app.UseForwardedHeaders();
-
-            // if (env.IsProduction())
-            // {
-            //    app.UseHsts();
-            // }
-            app.UseCors("SparkRoseDigital_TemplateClient");
-            app.UseHttpsRedirection();
-
-            // Commented out as we are running front end as a standalone app.
-            // app.UseSpaStaticFiles();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/SparkRoseDigital_TemplateOpenAPISpecification/swagger.json", "SparkRoseDigital_Template API");
-                c.RoutePrefix = string.Empty;
-            });
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseUserLoggingMiddleware();
-
-            // Second use of Logging Exceptions.
-            // This instance is here to catch and log any exceptions coming from the controllers.
-            // The reason for two logging middlewares is we can log user id and claims only
-            // after .UseAuthentication() and .UseAuthorization() are executed. So the first
-            // .UseApiExceptionHandler() has no access to user id and claims but has access to
-            // machine name and thus at least provides some insight into any potential exceptions
-            // coming from early in the pipeline. The second .UseApiExceptionHandler() has access
-            // to machine name, user id and claims and can log any exceptions from the controllers.
-            app.UseApiExceptionHandler(options =>
-            {
-                options.ApiErrorHandler = UpdateApiErrorResponse;
-                options.LogLevelHandler = LogLevelHandler;
-            });
-
-            app.UseEndpoints(endpoints =>
-            {
-                // Liveness check does not include database connectivity check because even a transient
-                // error will cause the orchestractor/load balancer to take the service down and restart it.
-                // Readiness check includes database connectivity check to tell the orchestractor/load balancer
-                // whether all the project dependencies are up and running.
-                endpoints.MapHealthChecks("/health/live", new HealthCheckOptions
-                {
-                    Predicate = _ => false, // No additional health checks.
-                });
-                endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions
-                {
-                    ResponseWriter = HealthCheckResponses.WriteJsonResponse
-                });
-                endpoints.MapControllers();
-            });
-
-            // Commented out as we are running front end as a standalone app.
-            // app.UseSpa(spa =>
-            // {
-            //     spa.Options.SourcePath = "ClientApp";
-            //     if (env.IsDevelopment())
-            //     {
-            //         // This is used if starting both front end and back end with the same command.
-            //         // spa.UseReactDevelopmentServer(npmScript: "start");
-            //         // This is used if starting front end separately from the back end, most likely to get better
-            //         // separation. Faster hot reload when changing only front end and not having to go through front end
-            //         // rebuild every time you change something on the back end.
-            //         spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-            //     }
-            // });
-        }
-
-        /// <summary>
-        /// A demonstration of how returned message can be modified.
-        /// </summary>
-        private void UpdateApiErrorResponse(HttpContext context, Exception ex, ProblemDetails problemDetails)
-        {
-            // if (ex is LimitNotMappable)
-            // {
-            //     problemDetails.Detail = "A general error occurred.";
-            // }
-        }
-
-        /// <summary>
-        /// Define cases where a different log level is needed for logging exceptions.
-        /// </summary>
-        private LogLevel LogLevelHandler(HttpContext context, Exception ex) =>
-
-            // if (ex is Exception)
-            // {
-            //     return LogLevel.Critical;
-            // }
-            // return LogLevel.Error;
-            LogLevel.Critical;
+        _configuration = configuration;
+        _hostEnvironment = hostEnvironment;
     }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers(configure =>
+        {
+            configure.ReturnHttpNotAcceptable = true;
+            configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
+            configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status404NotFound));
+            configure.Filters.Add(new ProducesResponseTypeAttribute(typeof(object), StatusCodes.Status406NotAcceptable));
+            configure.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
+        });
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<Startup>();
+
+        services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
+        {
+            var sqlConnectionStringBuilder = new SqlConnectionStringBuilder(_configuration["SparkRoseDigital_TemplateDbConnection"] ?? string.Empty);
+            if (_hostEnvironment.IsDevelopment())
+            {
+                sqlConnectionStringBuilder.UserID = _configuration["DbUser"] ?? string.Empty;
+                sqlConnectionStringBuilder.Password = _configuration["DbPassword"] ?? string.Empty;
+            }
+            else
+            {
+                sqlConnectionStringBuilder.Authentication = SqlAuthenticationMethod.ActiveDirectoryManagedIdentity;
+            }
+            options.UseSqlServer(sqlConnectionStringBuilder.ConnectionString);
+            if (_hostEnvironment.IsDevelopment())
+            {
+                options.EnableSensitiveDataLogging(true);
+            }
+        });
+
+        services.AddGenericRepository();
+        services.AddSpecificRepositories();
+        services.AddCoreServices();
+
+        services
+            .AddAuthentication("Bearer")
+            .AddJwtBearer(options =>
+            {
+                options.Authority = _configuration["AuthAuthority"];
+                options.Audience = _configuration["AuthAudience"];
+                options.TokenValidationParameters.ValidIssuer = _configuration["AuthValidIssuer"];
+            });
+
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        services.AddLoggingScopes();
+        if (!string.IsNullOrEmpty(_configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+        {
+            services
+                .AddOpenTelemetry()
+                .WithTracing(tracerProviderBuilder =>
+                {
+                    if (_hostEnvironment.IsDevelopment())
+                    {
+                        tracerProviderBuilder.SetSampler<AlwaysOnSampler>();
+                    }
+                    tracerProviderBuilder
+                        .AddSource(ApiAssemblyInfo.Value.GetName().Name)
+                        .SetResourceBuilder(
+                            ResourceBuilder
+                                .CreateDefault()
+                                .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
+                        .AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddEntityFrameworkCoreInstrumentation()
+                        .AddSqlClientInstrumentation()
+                        .AddSource(DiagnosticHeaders.DefaultListenerName) // MassTransit ActivitySource
+                        .AddAzureMonitorTraceExporter(o =>
+                        {
+                            o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                        });
+                })
+                .WithMetrics(meterProviderBuilder =>
+                {
+                    // Resource describing which Meters report on which metrics:
+                    // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/built-in-metrics
+                    // Reason you might want to refer to this resource is so you know what metrics to
+                    // look into when using Application Insights Metrics tab.
+                    meterProviderBuilder
+                        .SetResourceBuilder(
+                            ResourceBuilder
+                                .CreateDefault()
+                                .AddService(serviceName: ApiAssemblyInfo.Value.GetName().Name))
+                        .AddRuntimeInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter: https://masstransit.io/documentation/configuration/observability
+                        .AddAzureMonitorMetricExporter(o =>
+                        {
+                            o.ConnectionString = _configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+                        });
+                });
+        }
+
+        services.AddAutoMapper(Assembly.GetExecutingAssembly(), typeof(Startup).Assembly);
+
+        services.AddSingleton<ICache, Cache>();
+        services.AddMemoryCache();
+
+        services.AddSwaggerGen(setupAction =>
+        {
+            setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Description = "Bearer Authentication with JWT Token",
+                Type = SecuritySchemeType.Http
+            });
+            setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    },
+                    new List<string>()
+                }
+            });
+            setupAction.SwaggerDoc(
+                "SparkRoseDigital_TemplateOpenAPISpecification",
+                new OpenApiInfo
+                {
+                    Title = "SparkRoseDigital_Template API",
+                    Version = "v1",
+                    Description = "This API allows access to SparkRoseDigital_Template.",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Author Name",
+                        Url = new Uri("https://github.com")
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT",
+                        Url = new Uri("https://www.opensource.org/licenses/MIT")
+                    },
+                    TermsOfService = new Uri("https://www.my-terms-of-service.com")
+                });
+
+            // A workaround for having multiple POST methods on one controller.
+            // setupAction.ResolveConflictingActions(r => r.First());
+            setupAction.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SparkRoseDigital_Template.Api.xml"));
+        });
+
+        // Commented out as we are running front end as a standalone app.
+        // services.AddSpaStaticFiles(configuration =>
+        // {
+        //     configuration.RootPath = "ClientApp/build";
+        // });
+        services.AddCors(o => o.AddPolicy("All", builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithExposedHeaders(Constants.Headers.Pagination);
+        }));
+
+        services.AddCors(o => o.AddPolicy("SparkRoseDigital_TemplateClient", builder =>
+        {
+            var allowedOrigins = _configuration["AllowedOrigins"]?.Split(',') ?? Array.Empty<string>();
+            builder
+                .WithOrigins(allowedOrigins)
+                .WithHeaders("Authorization", "Content-Type")
+                .WithExposedHeaders(Constants.Headers.Pagination)
+                .WithMethods(HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete);
+        }));
+
+        services.AddMassTransit(x =>
+        {
+            if (string.IsNullOrEmpty(_configuration["MessageBroker"]))
+            {
+                x.UsingInMemory();
+            }
+            else
+            {
+                x.UsingAzureServiceBus((ctx, cfg) =>
+                {
+                    cfg.Host(_configuration["MessageBroker"]);
+
+                    // Use the below line if you are not going with SetKebabCaseEndpointNameFormatter() above.
+                    // Remember to configure the subscription endpoint accordingly (see WorkerServices Program.cs).
+                    // cfg.Message<VoteCast>(configTopology => configTopology.SetEntityName("vote-cast-topic"));
+                });
+            }
+            x.AddEntityFrameworkOutbox<SparkRoseDigital_TemplateDbContext>(o =>
+            {
+                // configure which database lock provider to use (Postgres, SqlServer, or MySql)
+                o.UseSqlServer();
+
+                // enable the bus outbox
+                o.UseBusOutbox();
+                o.QueryDelay = TimeSpan.FromSeconds(15);
+            });
+        });
+        services.AddSparkRoseDigital_TemplateApplicationHandlers();
+
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
+
+        services
+            .AddHealthChecks()
+            .AddDbContextCheck<SparkRoseDigital_TemplateDbContext>();
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseHostLoggingMiddleware();
+
+        // First use of Logging Exceptions.
+        // This instance is here to catch and log any exceptions coming from middlewares
+        // executed early in the pipeline.
+        app.UseApiExceptionHandler(options =>
+        {
+            options.ApiErrorHandler = UpdateApiErrorResponse;
+            options.LogLevelHandler = LogLevelHandler;
+        });
+
+        // Use headers forwarded by reverse proxy.
+        app.UseForwardedHeaders();
+
+        // if (env.IsProduction())
+        // {
+        //    app.UseHsts();
+        // }
+        app.UseCors("SparkRoseDigital_TemplateClient");
+        app.UseHttpsRedirection();
+
+        // Commented out as we are running front end as a standalone app.
+        // app.UseSpaStaticFiles();
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/SparkRoseDigital_TemplateOpenAPISpecification/swagger.json", "SparkRoseDigital_Template API");
+            c.RoutePrefix = string.Empty;
+        });
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseUserLoggingMiddleware();
+
+        // Second use of Logging Exceptions.
+        // This instance is here to catch and log any exceptions coming from the controllers.
+        // The reason for two logging middlewares is we can log user id and claims only
+        // after .UseAuthentication() and .UseAuthorization() are executed. So the first
+        // .UseApiExceptionHandler() has no access to user id and claims but has access to
+        // machine name and thus at least provides some insight into any potential exceptions
+        // coming from early in the pipeline. The second .UseApiExceptionHandler() has access
+        // to machine name, user id and claims and can log any exceptions from the controllers.
+        app.UseApiExceptionHandler(options =>
+        {
+            options.ApiErrorHandler = UpdateApiErrorResponse;
+            options.LogLevelHandler = LogLevelHandler;
+        });
+
+        app.UseEndpoints(endpoints =>
+        {
+            // Liveness check does not include database connectivity check because even a transient
+            // error will cause the orchestractor/load balancer to take the service down and restart it.
+            // Readiness check includes database connectivity check to tell the orchestractor/load balancer
+            // whether all the project dependencies are up and running.
+            endpoints.MapHealthChecks("/health/live", new HealthCheckOptions
+            {
+                Predicate = _ => false, // No additional health checks.
+            });
+            endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions
+            {
+                ResponseWriter = HealthCheckResponses.WriteJsonResponse
+            });
+            endpoints.MapControllers();
+        });
+
+        // Commented out as we are running front end as a standalone app.
+        // app.UseSpa(spa =>
+        // {
+        //     spa.Options.SourcePath = "ClientApp";
+        //     if (env.IsDevelopment())
+        //     {
+        //         // This is used if starting both front end and back end with the same command.
+        //         // spa.UseReactDevelopmentServer(npmScript: "start");
+        //         // This is used if starting front end separately from the back end, most likely to get better
+        //         // separation. Faster hot reload when changing only front end and not having to go through front end
+        //         // rebuild every time you change something on the back end.
+        //         spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+        //     }
+        // });
+    }
+
+    /// <summary>
+    /// A demonstration of how returned message can be modified.
+    /// </summary>
+    private void UpdateApiErrorResponse(HttpContext context, Exception ex, ProblemDetails problemDetails)
+    {
+        // if (ex is LimitNotMappable)
+        // {
+        //     problemDetails.Detail = "A general error occurred.";
+        // }
+    }
+
+    /// <summary>
+    /// Define cases where a different log level is needed for logging exceptions.
+    /// </summary>
+    private LogLevel LogLevelHandler(HttpContext context, Exception ex) =>
+
+        // if (ex is Exception)
+        // {
+        //     return LogLevel.Critical;
+        // }
+        // return LogLevel.Error;
+        LogLevel.Critical;
 }

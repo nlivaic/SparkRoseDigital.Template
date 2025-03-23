@@ -1,6 +1,5 @@
-﻿namespace SparkRoseDigital_Template.Application.Tests.Helpers
+﻿namespace SparkRoseDigital_Template.Application.Tests.Helpers;
+
+public class Request
 {
-    public class Request
-    {
-    }
 }

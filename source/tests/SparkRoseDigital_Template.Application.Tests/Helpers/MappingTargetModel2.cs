@@ -1,10 +1,9 @@
-﻿namespace SparkRoseDigital_Template.Application.Tests.Helpers
+﻿namespace SparkRoseDigital_Template.Application.Tests.Helpers;
+
+public class MappingTargetModel2
 {
-    public class MappingTargetModel2
-    {
-        public string TargetProperty1 { get; set; }
-        public string TargetProperty2 { get; set; }
-        public string TargetProperty3 { get; set; }
-        public string TargetProperty4 { get; set; }
-    }
+    public string TargetProperty1 { get; set; }
+    public string TargetProperty2 { get; set; }
+    public string TargetProperty3 { get; set; }
+    public string TargetProperty4 { get; set; }
 }

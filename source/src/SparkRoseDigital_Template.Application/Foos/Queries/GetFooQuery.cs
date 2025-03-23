@@ -5,23 +5,22 @@ using AutoMapper;
 using MediatR;
 using SparkRoseDigital_Template.Core.Entities;
 
-namespace SparkRoseDigital_Template.Application.Foos.Queries
+namespace SparkRoseDigital_Template.Application.Foos.Queries;
+
+public class GetFooQuery : IRequest<FooGetModel>
 {
-    public class GetFooQuery : IRequest<FooGetModel>
+    public Guid Id { get; set; }
+
+    private class GetFooQueryHandler : IRequestHandler<GetFooQuery, FooGetModel>
     {
-        public Guid Id { get; set; }
+        private readonly IMapper _mapper;
 
-        private class GetFooQueryHandler : IRequestHandler<GetFooQuery, FooGetModel>
+        public GetFooQueryHandler(IMapper mapper)
         {
-            private readonly IMapper _mapper;
-
-            public GetFooQueryHandler(IMapper mapper)
-            {
-                _mapper = mapper;
-            }
-
-            public Task<FooGetModel> Handle(GetFooQuery request, CancellationToken cancellationToken) =>
-                Task.FromResult(_mapper.Map<FooGetModel>(new Foo("foofoo")));
+            _mapper = mapper;
         }
+
+        public Task<FooGetModel> Handle(GetFooQuery request, CancellationToken cancellationToken) =>
+            Task.FromResult(_mapper.Map<FooGetModel>(new Foo("foofoo")));
     }
 }

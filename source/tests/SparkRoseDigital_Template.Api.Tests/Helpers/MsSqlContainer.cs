@@ -11,7 +11,7 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
         private const string _password = "yourStrong(!)Password";
         private const int _msSqlPort = 1433;
         private readonly IContainer _mssqlContainer = new ContainerBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-CU1-ubuntu-20.04")
+            .WithImage("mcr.microsoft.com/mssql/server:2022-CU13-ubuntu-22.04")
             .WithPortBinding(_msSqlPort, true)
             .WithEnvironment("ACCEPT_EULA", "Y")
             .WithEnvironment("SQLCMDUSER", _username)

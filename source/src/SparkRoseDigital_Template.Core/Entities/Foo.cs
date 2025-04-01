@@ -4,7 +4,7 @@ using SparkRoseDigital_Template.Common.Exceptions;
 
 namespace SparkRoseDigital_Template.Core.Entities
 {
-    public class Foo : BaseEntity<Guid>
+    public class Foo : BaseVersionedEntity<Guid>
     {
         public Foo(string text)
         {
@@ -16,7 +16,7 @@ namespace SparkRoseDigital_Template.Core.Entities
         {
         }
 
-        public string Text { get; private set; }
+        public string Text { get; set; }
 
         private static void Validate(string text)
         {

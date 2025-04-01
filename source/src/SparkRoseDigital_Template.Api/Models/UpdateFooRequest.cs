@@ -5,7 +5,12 @@ using SparkRoseDigital_Template.Application.Foos.Commands;
 
 namespace SparkRoseDigital_Template.Api.Models;
 
-public record UpdateFooRequest(Guid Id, string Text);
+public class UpdateFooRequest
+{
+    public Guid Id { get; set; }
+    public string Text { get; set; }
+    public byte[] RowVersion { get; set; }
+}
 
 public class UpdateFooRequestValidator : AbstractValidator<UpdateFooRequest>
 {

@@ -11,89 +11,88 @@ using SparkRoseDigital_Template.Api.Middlewares;
 using SparkRoseDigital_Template.Common.Exceptions;
 using Xunit;
 
-namespace SparkRoseDigital_Template.Api.Tests
+namespace SparkRoseDigital_Template.Api.Tests;
+
+public class ApiExceptionHandlerMiddlewareTests
 {
-    public class ApiExceptionHandlerMiddlewareTests
+    [Fact]
+    public async Task Api_ApiExceptionHandlerMiddleware_CatchesNotFoundExceptionAsync_AsProblemDetails404()
     {
-        [Fact]
-        public async Task Api_ApiExceptionHandlerMiddleware_CatchesNotFoundExceptionAsync_AsProblemDetails404()
-        {
-            // Arrange
-            using var host = await new HostBuilder()
-                .ConfigureWebHost(webBuilder =>
-                {
-                    webBuilder
-                        .UseTestServer()
-                        .Configure(app =>
+        // Arrange
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .Configure(app =>
+                    {
+                        app.UseApiExceptionHandler(options =>
                         {
-                            app.UseApiExceptionHandler(options =>
-                            {
-                            });
-                            app.Run(ctx => throw new EntityNotFoundException("Test Entity", default(Guid)));
                         });
-                })
-                .StartAsync();
-            // Act
-            var response = await host.GetTestClient().GetAsync("/");
-            var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
+                        app.Run(ctx => throw new EntityNotFoundException("Test Entity", default(Guid)));
+                    });
+            })
+            .StartAsync();
+        // Act
+        var response = await host.GetTestClient().GetAsync("/");
+        var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
 
-            // Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            Assert.IsType<ProblemDetails>(responseBody);
-        }
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.IsType<ProblemDetails>(responseBody);
+    }
 
-        [Fact]
-        public async Task Api_ApiExceptionHandlerMiddleware_CatchesBusinessExceptionAsync_AsProblemDetails422()
-        {
-            // Arrange
-            using var host = await new HostBuilder()
-                .ConfigureWebHost(webBuilder =>
-                {
-                    webBuilder
-                        .UseTestServer()
-                        .Configure(app =>
+    [Fact]
+    public async Task Api_ApiExceptionHandlerMiddleware_CatchesBusinessExceptionAsync_AsProblemDetails422()
+    {
+        // Arrange
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .Configure(app =>
+                    {
+                        app.UseApiExceptionHandler(options =>
                         {
-                            app.UseApiExceptionHandler(options =>
-                            {
-                            });
-                            app.Run(ctx => throw new BusinessException("Test Message"));
                         });
-                })
-                .StartAsync();
-            // Act
-            var response = await host.GetTestClient().GetAsync("/");
-            var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
+                        app.Run(ctx => throw new BusinessException("Test Message"));
+                    });
+            })
+            .StartAsync();
+        // Act
+        var response = await host.GetTestClient().GetAsync("/");
+        var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
 
-            // Assert
-            Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-            Assert.IsType<ProblemDetails>(responseBody);
-        }
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.IsType<ProblemDetails>(responseBody);
+    }
 
-        [Fact]
-        public async Task Api_ApiExceptionHandlerMiddleware_CatchesOtherExceptionsAsync_AsProblemDetails500()
-        {
-            // Arrange
-            using var host = await new HostBuilder()
-                .ConfigureWebHost(webBuilder =>
-                {
-                    webBuilder
-                        .UseTestServer()
-                        .Configure(app =>
+    [Fact]
+    public async Task Api_ApiExceptionHandlerMiddleware_CatchesOtherExceptionsAsync_AsProblemDetails500()
+    {
+        // Arrange
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .Configure(app =>
+                    {
+                        app.UseApiExceptionHandler(options =>
                         {
-                            app.UseApiExceptionHandler(options =>
-                            {
-                            });
-                            app.Run(ctx => throw new Exception("Test Message"));
                         });
-                })
-                .StartAsync();
-            // Act
-            var response = await host.GetTestClient().GetAsync("/");
-            var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
+                        app.Run(ctx => throw new Exception("Test Message"));
+                    });
+            })
+            .StartAsync();
+        // Act
+        var response = await host.GetTestClient().GetAsync("/");
+        var responseBody = JsonSerializer.Deserialize<ProblemDetails>(await response.Content.ReadAsStringAsync());
 
-            // Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            Assert.IsType<ProblemDetails>(responseBody);
-        }
+        // Assert
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.IsType<ProblemDetails>(responseBody);
     }
 }

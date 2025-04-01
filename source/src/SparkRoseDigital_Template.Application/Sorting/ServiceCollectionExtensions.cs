@@ -1,17 +1,16 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SparkRoseDigital_Template.Application.Sorting
+namespace SparkRoseDigital_Template.Application.Sorting;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void AddPropertyMappingService(
+        this IServiceCollection services,
+        Action<PropertyMappingOptions> configuration)
     {
-        public static void AddPropertyMappingService(
-            this IServiceCollection services,
-            Action<PropertyMappingOptions> configuration)
-        {
-            var options = new PropertyMappingOptions();
-            configuration?.Invoke(options);
-            services.AddSingleton<IPropertyMappingService>(_ => new PropertyMappingService(options));
-        }
+        var options = new PropertyMappingOptions();
+        configuration?.Invoke(options);
+        services.AddSingleton<IPropertyMappingService>(_ => new PropertyMappingService(options));
     }
 }

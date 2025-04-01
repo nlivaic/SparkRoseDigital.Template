@@ -3,64 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using SparkRoseDigital_Template.Application.Sorting.Models;
 
-namespace SparkRoseDigital_Template.Application.Sorting
+namespace SparkRoseDigital_Template.Application.Sorting;
+
+public class PropertyMappingService : IPropertyMappingService
 {
-    public class PropertyMappingService : IPropertyMappingService
+    private readonly IEnumerable<IPropertyMapping> _propertyMappings;
+
+    public PropertyMappingService(PropertyMappingOptions propertyMappingOptions)
     {
-        private readonly IEnumerable<IPropertyMapping> _propertyMappings;
+        _propertyMappings = propertyMappingOptions.PropertyMappings ?? new List<IPropertyMapping>();
+    }
 
-        public PropertyMappingService(PropertyMappingOptions propertyMappingOptions)
+    /// <summary>
+    /// Map source and destination properties. Returns a list of destination properties for each source property.
+    /// One caveat: you cannot sort on destination properties that have additional aggregation methods applied to them
+    /// in the AutoMapper profile (e.g. `Question.Answers.Count()` mapping to `QuestionSummariesGetViewModel.Answers`,
+    /// because the resulting Linq query will cause EF Core to break.
+    /// </summary>
+    /// <param name="source">Resource parameters, with zero or more properties to source from.</param>
+    /// <param name="target">Target (query) parameters.</param>
+    /// <returns>A list of properties to execute the ordering on.</returns>
+    public IEnumerable<SortCriteria> Resolve(BaseSortable source, BaseSortable target)
+    {
+        var sortCriterias = new List<SortCriteria>();
+        foreach (var s in source.SortBy)
         {
-            _propertyMappings = propertyMappingOptions.PropertyMappings ?? new List<IPropertyMapping>();
-        }
-
-        /// <summary>
-        /// Map source and destination properties. Returns a list of destination properties for each source property.
-        /// One caveat: you cannot sort on destination properties that have additional aggregation methods applied to them
-        /// in the AutoMapper profile (e.g. `Question.Answers.Count()` mapping to `QuestionSummariesGetViewModel.Answers`,
-        /// because the resulting Linq query will cause EF Core to break.
-        /// </summary>
-        /// <param name="source">Resource parameters, with zero or more properties to source from.</param>
-        /// <param name="target">Target (query) parameters.</param>
-        /// <returns>A list of properties to execute the ordering on.</returns>
-        public IEnumerable<SortCriteria> Resolve(BaseSortable source, BaseSortable target)
-        {
-            var sortCriterias = new List<SortCriteria>();
-            foreach (var s in source.SortBy)
+            PropertyMappingValue targetMapping = null;
+            try
             {
-                PropertyMappingValue targetMapping = null;
-                try
-                {
-                    targetMapping = GetMapping(source.ResourceType, s.SortByCriteria, target.ResourceType);
-                }
-                catch (InvalidPropertyMappingException)
-                {
-                    // Skip erroneous mapping and move on to next sort criteria.
-                    continue;
-                }
-                sortCriterias.AddRange(
-                    targetMapping.TargetPropertyNames.Select(tpn =>
-                        new SortCriteria
-                        {
-                            SortByCriteria = tpn,
-                            SortDirection = targetMapping.Revert
-                                ? s.SortDirection == SortDirection.Desc
-                                    ? SortDirection.Asc
-                                    : SortDirection.Desc
-                                : s.SortDirection == SortDirection.Asc
-                                    ? SortDirection.Asc
-                                    : SortDirection.Desc
-                        }));
+                targetMapping = GetMapping(source.ResourceType, s.SortByCriteria, target.ResourceType);
             }
-            return sortCriterias;
+            catch (InvalidPropertyMappingException)
+            {
+                // Skip erroneous mapping and move on to next sort criteria.
+                continue;
+            }
+            sortCriterias.AddRange(
+                targetMapping.TargetPropertyNames.Select(tpn =>
+                    new SortCriteria
+                    {
+                        SortByCriteria = tpn,
+                        SortDirection = targetMapping.Revert
+                            ? s.SortDirection == SortDirection.Desc
+                                ? SortDirection.Asc
+                                : SortDirection.Desc
+                            : s.SortDirection == SortDirection.Asc
+                                ? SortDirection.Asc
+                                : SortDirection.Desc
+                    }));
         }
+        return sortCriterias;
+    }
 
-        private PropertyMappingValue GetMapping(Type source, string sourcePropertyName, Type target)
-        {
-            var propertyMapping = _propertyMappings
-                .SingleOrDefault(pm => pm.Source == source && pm.Target == target)
-                ?? throw new InvalidPropertyMappingException($"Unknown property mapping types: {source}, {target}.");
-            return propertyMapping.GetMapping(sourcePropertyName);
-        }
+    private PropertyMappingValue GetMapping(Type source, string sourcePropertyName, Type target)
+    {
+        var propertyMapping = _propertyMappings
+            .SingleOrDefault(pm => pm.Source == source && pm.Target == target)
+            ?? throw new InvalidPropertyMappingException($"Unknown property mapping types: {source}, {target}.");
+        return propertyMapping.GetMapping(sourcePropertyName);
     }
 }

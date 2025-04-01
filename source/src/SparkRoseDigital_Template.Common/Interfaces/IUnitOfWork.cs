@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace SparkRoseDigital_Template.Common.Interfaces
+namespace SparkRoseDigital_Template.Common.Interfaces;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task<int> SaveAsync();
-    }
+    Task<int> SaveAsync();
 }

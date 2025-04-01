@@ -4,42 +4,41 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace SparkRoseDigital_Template.Common.MessageBroker.Middlewares.ErrorLogging
+namespace SparkRoseDigital_Template.Common.MessageBroker.Middlewares.ErrorLogging;
+
+public class ExceptionLoggerFilter<T> : IFilter<T>
+    where T : class, PipeContext
 {
-    public class ExceptionLoggerFilter<T> : IFilter<T>
-        where T : class, PipeContext
+    private readonly ILogger<ExceptionLoggerFilter<T>> _logger;
+
+    public ExceptionLoggerFilter(IServiceCollection serviceCollection)
     {
-        private readonly ILogger<ExceptionLoggerFilter<T>> _logger;
+        _logger = serviceCollection.BuildServiceProvider().GetRequiredService<ILogger<ExceptionLoggerFilter<T>>>();
+    }
 
-        public ExceptionLoggerFilter(IServiceCollection serviceCollection)
+    public void Probe(ProbeContext context)
+    {
+        // var scope = context.CreateFilterScope("exceptionLogger");
+    }
+
+    /// <summary>
+    /// Log exceptions thrown from consumers. Handles any consumer.
+    /// </summary>
+    /// <param name="context">The context sent through the pipeline.</param>
+    /// <param name="next">The next filter in the pipe, must be called or the pipe ends here.</param>
+    public async Task Send(T context, IPipe<T> next)
+    {
+        try
         {
-            _logger = serviceCollection.BuildServiceProvider().GetRequiredService<ILogger<ExceptionLoggerFilter<T>>>();
+            // here the next filter in the pipe is called
+            await next.Send(context);
         }
-
-        public void Probe(ProbeContext context)
+        catch (Exception ex)
         {
-            // var scope = context.CreateFilterScope("exceptionLogger");
-        }
+            _logger.LogError(ex, ex.Message);
 
-        /// <summary>
-        /// Log exceptions thrown from consumers. Handles any consumer.
-        /// </summary>
-        /// <param name="context">The context sent through the pipeline.</param>
-        /// <param name="next">The next filter in the pipe, must be called or the pipe ends here.</param>
-        public async Task Send(T context, IPipe<T> next)
-        {
-            try
-            {
-                // here the next filter in the pipe is called
-                await next.Send(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-
-                // propagate the exception up the call stack
-                throw;
-            }
+            // propagate the exception up the call stack
+            throw;
         }
     }
 }

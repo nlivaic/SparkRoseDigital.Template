@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 
+
 namespace SparkRoseDigital_Template.WorkerServices
 {
     public static class WorkerAssemblyInfo

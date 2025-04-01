@@ -156,8 +156,6 @@ dotnet_diagnostic.SA1413.severity = none
 # Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1633.severity = none
-# File-scoped namespaces
-csharp_style_namespace_declarations = file_scoped:error
 dotnet_diagnostic.IDE0161.severity = error
 
 ################################################################

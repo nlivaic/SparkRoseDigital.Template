@@ -1,12 +1,11 @@
 using System;
 
-namespace SparkRoseDigital_Template.Common.Exceptions
+namespace SparkRoseDigital_Template.Common.Exceptions;
+
+public class BusinessException : Exception
 {
-    public class BusinessException : Exception
+    public BusinessException(string message)
+        : base(message)
     {
-        public BusinessException(string message)
-            : base(message)
-        {
-        }
     }
 }

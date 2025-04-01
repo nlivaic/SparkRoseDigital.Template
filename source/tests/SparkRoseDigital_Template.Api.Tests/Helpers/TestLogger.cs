@@ -1,32 +1,31 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace SparkRoseDigital_Template.Api.Tests.Helpers
+namespace SparkRoseDigital_Template.Api.Tests.Helpers;
+
+public class TestLogger : ILogger
 {
-    public class TestLogger : ILogger
+    private readonly Action<string> _logTo;
+    private readonly LogLevel _level;
+
+    public TestLogger(Action<string> logTo, LogLevel level)
     {
-        private readonly Action<string> _logTo;
-        private readonly LogLevel _level;
+        _logTo = logTo;
+        _level = level;
+    }
 
-        public TestLogger(Action<string> logTo, LogLevel level)
-        {
-            _logTo = logTo;
-            _level = level;
-        }
+    public IDisposable BeginScope<TState>(TState state)
+    {
+        return null;
+    }
 
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            return null;
-        }
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return logLevel >= _level;
+    }
 
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return logLevel >= _level;
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            _logTo(state.ToString());
-        }
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    {
+        _logTo(state.ToString());
     }
 }

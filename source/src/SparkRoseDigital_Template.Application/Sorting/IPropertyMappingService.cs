@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using SparkRoseDigital_Template.Application.Sorting.Models;
 
-namespace SparkRoseDigital_Template.Application.Sorting
+namespace SparkRoseDigital_Template.Application.Sorting;
+
+public interface IPropertyMappingService
 {
-    public interface IPropertyMappingService
-    {
-        IEnumerable<SortCriteria> Resolve(BaseSortable sortableSource, BaseSortable sortableTarget);
-    }
+    IEnumerable<SortCriteria> Resolve(BaseSortable sortableSource, BaseSortable sortableTarget);
 }

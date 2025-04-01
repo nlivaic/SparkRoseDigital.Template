@@ -1,7 +1,6 @@
-﻿namespace SparkRoseDigital_Template.Core.Events
+﻿namespace SparkRoseDigital_Template.Core.Events;
+
+public interface IFooEvent
 {
-    public interface IFooEvent
-    {
-        public string Text { get; set; }
-    }
+    public string Text { get; set; }
 }

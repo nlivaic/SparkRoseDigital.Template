@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using MassTransit;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,8 +48,7 @@ namespace SparkRoseDigital_Template.Api.Tests.Helpers
                 services
                     .AddAuthentication("Test")
                     .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", null);
-                services.Remove(services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<SparkRoseDigital_TemplateDbContext>)));
-                services.Remove(services.SingleOrDefault(d => d.ServiceType == typeof(DbConnection)));
+                services.Remove(services.SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<SparkRoseDigital_TemplateDbContext>)));
                 services.AddDbContext<SparkRoseDigital_TemplateDbContext>(options =>
                 {
                     options.UseSqlServer(_msSqlContainer.ConnectionString);

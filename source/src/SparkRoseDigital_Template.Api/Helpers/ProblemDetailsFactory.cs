@@ -44,7 +44,7 @@ public class ProblemDetailsFactory
             Instance = httpContext.Request.Path,
             Status = httpContext.Request.Method == HttpMethods.Delete
             ? StatusCodes.Status409Conflict
-            : StatusCodes.Status422UnprocessableEntity;
+            : StatusCodes.Status422UnprocessableEntity
         };
         problemDetails.Extensions.Add("traceId", Activity.Current?.Id.ToString() ?? httpContext.TraceIdentifier);
         return problemDetails;

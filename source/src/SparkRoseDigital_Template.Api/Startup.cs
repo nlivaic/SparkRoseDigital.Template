@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
@@ -148,6 +149,7 @@ public class Startup
         services.AddSingleton<ICache, Cache>();
         services.AddMemoryCache();
 
+        services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(setupAction =>
         {
             setupAction.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -155,7 +157,7 @@ public class Startup
                 Scheme = "bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Name = "Authorization",
+                Name = HeaderNames.Authorization,
                 Description = "Bearer Authentication with JWT Token",
                 Type = SecuritySchemeType.Http
             });
@@ -193,16 +195,9 @@ public class Startup
                     TermsOfService = new Uri("https://www.my-terms-of-service.com")
                 });
 
-            // A workaround for having multiple POST methods on one controller.
-            // setupAction.ResolveConflictingActions(r => r.First());
             setupAction.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "SparkRoseDigital_Template.Api.xml"));
         });
 
-        // Commented out as we are running front end as a standalone app.
-        // services.AddSpaStaticFiles(configuration =>
-        // {
-        //     configuration.RootPath = "ClientApp/build";
-        // });
         services.AddCors(o => o.AddPolicy("All", builder =>
         {
             builder.AllowAnyOrigin()
@@ -285,8 +280,6 @@ public class Startup
         app.UseCors("SparkRoseDigital_TemplateClient");
         app.UseHttpsRedirection();
 
-        // Commented out as we are running front end as a standalone app.
-        // app.UseSpaStaticFiles();
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
@@ -329,7 +322,9 @@ public class Startup
             {
                 ResponseWriter = HealthCheckResponses.WriteJsonResponse
             });
-            endpoints.MapControllers();
+            endpoints
+                .MapGroup(Endpoints.Group.Api) // Common prefix for all endpoints.
+                .MapEndpoints();
         });
 
         // Commented out as we are running front end as a standalone app.

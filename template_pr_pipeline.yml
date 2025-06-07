@@ -35,6 +35,14 @@ stages:
         - script: ls -al
           displayName: 'Basic Information - Directory Contents'
 
+        - task: Bash@3
+          displayName: 'Install Mono via apt'
+          inputs:
+            targetType: 'inline'
+            script: |
+              sudo apt-get update
+              sudo apt-get install -y mono-devel
+        
         - task: UseDotNet@2
           displayName: Install .NET Core SDK
           inputs:
@@ -102,8 +110,6 @@ stages:
             projects: '**/*.csproj'
             publishTestResults: true
             configuration: $(buildConfiguration)
-
-        - task: NuGetAuthenticate@1
 
         - task: NuGetCommand@2
           displayName: 'nuget pack'

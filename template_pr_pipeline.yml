@@ -103,6 +103,8 @@ stages:
             publishTestResults: true
             configuration: $(buildConfiguration)
 
+        - task: NuGetAuthenticate@1
+
         - task: NuGetCommand@2
           displayName: 'nuget pack'
           inputs:

@@ -1,5 +1,7 @@
 param ($sqlAdminUserName, $sqlAdminUserPassword, $resourceGroupName, $sqlServerName)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 $domain = (az rest --method get --url 'https://graph.microsoft.com/v1.0/domains?$select=id' --query value --output tsv)
 
 ####################################################

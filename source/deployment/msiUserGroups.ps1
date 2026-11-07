@@ -1,5 +1,7 @@
 param ($usersGroupName, $resourceGroupName, $appServiceWebName)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 ####################################################
 ### Create User Group
 ####################################################

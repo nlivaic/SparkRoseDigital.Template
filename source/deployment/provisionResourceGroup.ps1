@@ -1,5 +1,7 @@
 param ($location, $environment, $projectName)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 # Resource group
 Write-Host "##[warning]------ Create Resource Group START ------"
 $jsonResultRg = az deployment sub create --location $location --template-file ./deployment/resource-group.bicep --parameters environment=$environment projectName=$projectName location=$location | ConvertFrom-Json

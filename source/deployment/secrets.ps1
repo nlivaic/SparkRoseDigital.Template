@@ -1,5 +1,7 @@
 param ($keyVaultName, $dbConnectionString, $messageBrokerConnectionString, $authAuthority, $authAudience, $authValidIssuer)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 # Will expose method NewPassword
 . $PSScriptRoot\secretGenerator.ps1
 

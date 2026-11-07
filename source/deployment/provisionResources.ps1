@@ -1,5 +1,7 @@
 param ($environment, $projectName, $resourceGroupName, $sqlAdminUsername, $sqlAdminPassword, $vaultUri)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 Write-Host "##[warning]------ Create Resources START ------"
 $jsonResultAll = az deployment group create --resource-group $resourceGroupName --template-file ./deployment/iac.bicep --parameters environment=$environment projectName=$projectName sql_admin_username=$sqlAdminUsername sql_admin_password=$sqlAdminPassword vault_uri=$vaultUri| ConvertFrom-Json
 $appServiceWebName = $jsonResultAll.properties.outputs.appServiceWebName.value

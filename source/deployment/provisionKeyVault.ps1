@@ -1,5 +1,7 @@
 param ($environment, $projectName, $resourceGroupName)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 $rgId = az group show --resource-group $resourceGroupName --query id --output tsv
 ####################################################
 ### Create Key Vault 

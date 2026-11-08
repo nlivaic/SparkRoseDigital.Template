@@ -1,4 +1,6 @@
-param ($keyVaultName, $dbConnectionString, $messageBrokerConnectionString, $authAuthority, $authAudience, $authValidIssuer)
+# Connection strings default to environment variables because they contain ';',
+# which Azure DevOps shell task arguments validation rejects when passed via task arguments.
+param ($keyVaultName, $dbConnectionString = $env:DB_CONNECTION_STRING, $messageBrokerConnectionString = $env:MESSAGE_BROKER_CONNECTION_STRING, $authAuthority, $authAudience, $authValidIssuer)
 
 $PSNativeCommandUseErrorActionPreference = $true
 

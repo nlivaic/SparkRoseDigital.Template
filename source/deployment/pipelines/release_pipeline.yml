@@ -166,8 +166,12 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/secrets.ps1'
-            arguments: '$(provisionKeyVault.keyVaultName) "$(provisionResources.dbConnection)" "$(provisionResources.messageBrokerConnectionString)" "$(entraApiRegistration.authAuthority)" "$(entraApiRegistration.authAudience)" "$(entraApiRegistration.authValidIssuer)"'
+            arguments: '-keyVaultName $(provisionKeyVault.keyVaultName) -authAuthority "$(entraApiRegistration.authAuthority)" -authAudience "$(entraApiRegistration.authAudience)" -authValidIssuer "$(entraApiRegistration.authValidIssuer)"'
             powerShellErrorActionPreference: stop
+          # Connection strings contain ';', which shell task arguments validation rejects, so they are passed as environment variables.
+          env:
+            DB_CONNECTION_STRING: $(provisionResources.dbConnection)
+            MESSAGE_BROKER_CONNECTION_STRING: $(provisionResources.messageBrokerConnectionString)
 
         - task: AzureCLI@2
           displayName: 'Create MSI and User Group'
@@ -211,8 +215,11 @@ jobs:
             scriptType: pscore
             scriptLocation: 'scriptPath'
             scriptPath: './deployment/migrate.ps1'
-            arguments: '$(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll "$(SparkRoseDigital_TemplateDbConnection)" "$(sqlEntraAuth.sqlAdminUserPrincipalName)" "$(SqlAdminPassword)" $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations "$(USERS_GROUP_NAME)"'
+            arguments: '-locationExecutableDll $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations/SparkRoseDigital_Template.Migrations.dll -sqlAdminUsername "$(sqlEntraAuth.sqlAdminUserPrincipalName)" -sqlAdminPassword "$(SqlAdminPassword)" -adoDropFolder $(Pipeline.Workspace)/drop/SparkRoseDigital_Template.Migrations -usersGroupName "$(USERS_GROUP_NAME)"'
             powerShellErrorActionPreference: stop
+          # Connection string contains ';', which shell task arguments validation rejects, so it is passed as an environment variable.
+          env:
+            DB_CONNECTION_STRING: $(SparkRoseDigital_TemplateDbConnection)
 
         - task: AzureWebApp@1
           displayName: 'Deploy SparkRoseDigital_Template.Api to App Service'

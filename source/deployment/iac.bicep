@@ -10,6 +10,7 @@ param vault_uri string
 var regionCodes = {
   westeurope: 'we'
   northeurope: 'ne'
+  swedencentral: 'sc'
 }   
 // remove space and make sure all lower case
 var sanitizedLocation = toLower(replace(location, ' ', ''))

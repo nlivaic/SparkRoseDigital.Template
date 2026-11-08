@@ -22,14 +22,16 @@ Write-Host "##[warning]--- Create and Populate Azure Sql Admin - END ---"
 Write-Host "##[warning]--- Assign Azure Sql Admin Group to roles - START ---"
 $rgId = az group show --resource-group $resourceGroupName --query id --output tsv
 # Scoped to resource group
+# --assignee-object-id with --assignee-principal-type skips the Microsoft Graph lookup,
+# which fails for a newly created user that has not replicated yet.
 # Reader
-az role assignment create --assignee $sqlAdminUserId --role "acdd72a7-3385-48ef-bd42-f606fba81ae7" --scope $rgId
+az role assignment create --assignee-object-id $sqlAdminUserId --assignee-principal-type User --role "acdd72a7-3385-48ef-bd42-f606fba81ae7" --scope $rgId
 Write-Host "##[section]Added Entra user '$sqlAdminUserId' to role 'Reader'"
 # SQL Server Contributor
-az role assignment create --assignee $sqlAdminUserId --role "6d8ee4ec-f05a-4a1d-8b00-a9b17e38b437" --scope $rgId
+az role assignment create --assignee-object-id $sqlAdminUserId --assignee-principal-type User --role "6d8ee4ec-f05a-4a1d-8b00-a9b17e38b437" --scope $rgId
 Write-Host "##[section]Added Entra user '$sqlAdminUserId' to role 'SQL Server Contributor'"
 # SQL Security Manager
-az role assignment create --assignee $sqlAdminUserId --role "056cd41c-7e88-42e1-933e-88ba6a50c9c3" --scope $rgId
+az role assignment create --assignee-object-id $sqlAdminUserId --assignee-principal-type User --role "056cd41c-7e88-42e1-933e-88ba6a50c9c3" --scope $rgId
 Write-Host "##[section]Added Entra user '$sqlAdminUserId' to role 'SQL Security Manager'"
 Write-Host "##[warning]--- Assign Azure Sql Admin Group to roles - END ---"
 

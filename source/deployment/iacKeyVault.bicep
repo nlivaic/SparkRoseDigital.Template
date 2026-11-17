@@ -6,6 +6,8 @@ param tenantId string
 // Object containing a mapping for location / region code
 var regionCodes = {
   westeurope: 'we'
+  northeurope: 'ne'
+  swedencentral: 'sc'
 }   
 // remove space and make sure all lower case
 var sanitizedLocation = toLower(replace(location, ' ', ''))

@@ -1,4 +1,8 @@
-param ($keyVaultName, $dbConnectionString, $messageBrokerConnectionString, $authAuthority, $authAudience, $authValidIssuer)
+# Connection strings default to environment variables because they contain ';',
+# which Azure DevOps shell task arguments validation rejects when passed via task arguments.
+param ($keyVaultName, $dbConnectionString = $env:DB_CONNECTION_STRING, $messageBrokerConnectionString = $env:MESSAGE_BROKER_CONNECTION_STRING, $authAuthority, $authAudience, $authValidIssuer)
+
+$PSNativeCommandUseErrorActionPreference = $true
 
 # Will expose method NewPassword
 . $PSScriptRoot\secretGenerator.ps1
@@ -20,14 +24,14 @@ $validIssuerSecretName = "AuthValidIssuer"
 $query = "contains([].id, 'https://$($keyVaultName).vault.azure.net/secrets/$($sqlSaPasswordSecretName)')"
 $exists = az keyvault secret list --vault-name $keyVaultName --query $query
 if ($exists -eq "false") {
-	az keyvault secret set --vault-name $keyVaultName --name $sqlSaPasswordSecretName --value $(NewPassword) --output none
+	az keyvault secret set --vault-name $keyVaultName --name $sqlSaPasswordSecretName --value="$(NewPassword)" --output none
 	Write-Host "##[section]Set secret $sqlSaPasswordSecretName"
 }
 
 $query = "contains([].id, 'https://$($keyVaultName).vault.azure.net/secrets/$($sqlAdminPasswordSecretName)')"
 $exists = az keyvault secret list --vault-name $keyVaultName --query $query
 if ($exists -eq "false") {
-	az keyvault secret set --vault-name $keyVaultName --name $sqlAdminPasswordSecretName --value $(NewPassword) --output none
+	az keyvault secret set --vault-name $keyVaultName --name $sqlAdminPasswordSecretName --value="$(NewPassword)" --output none
 	Write-Host "##[section]Set secret $sqlAdminPasswordSecretName"
 }
 

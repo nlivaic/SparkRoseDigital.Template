@@ -15,7 +15,21 @@ $appRegistration = az ad app create `
 
 $appRegistrationResult = ($appRegistration | ConvertFrom-Json)
 $appRegistrationResultAppId = $appRegistrationResult.appId
-$azAppOID = (az ad app show --id $appRegistrationResultAppId  | ConvertFrom-JSON).id
+$azAppOID = $appRegistrationResult.id
+
+# A newly created app registration may not be readable right away (Microsoft Graph replication delay).
+# Wait until it is, otherwise subsequent updates fail with "Resource ... does not exist".
+$maxAttempts = 12
+for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    az ad app show --id $appRegistrationResultAppId --query id --output tsv 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) { break }
+    if ($attempt -eq $maxAttempts) {
+        Write-Error "App registration $appRegistrationResultAppId is still not readable after $maxAttempts attempts."
+        exit 1
+    }
+    Write-Host "##[section]App registration not yet available, retrying in 10 seconds ($attempt/$maxAttempts)..."
+    Start-Sleep -Seconds 10
+}
 
 Write-Host "##[section]Created API $displayNameApi with appId: $appRegistrationResultAppId"
 Write-Host "##[warning]--- Create Azure App Registration - END ---"

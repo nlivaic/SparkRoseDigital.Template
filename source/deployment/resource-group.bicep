@@ -7,6 +7,8 @@ targetScope = 'subscription'
 // Object containing a mapping for location / region code
 var regionCodes = {
   westeurope: 'WE'
+  northeurope: 'NE'
+  swedencentral: 'SC'
 }   
 // remove space and make sure all lower case
 var sanitizedLocation = toLower(replace(location, ' ', ''))

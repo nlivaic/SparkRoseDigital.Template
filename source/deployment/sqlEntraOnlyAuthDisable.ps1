@@ -10,6 +10,8 @@
 ####################################################
 param ($resourceGroupName)
 
+$PSNativeCommandUseErrorActionPreference = $true
+
 ####################################################
 ### Disable Entra-only auth for all SQL Servers in this Resource Group
 ####################################################
